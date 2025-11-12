@@ -20,7 +20,7 @@ def transform(v, q, p):
     [2*(qx*qy + qz*qw), 1 - 2*(qx**2 + qz**2), 2*(qy*qz - qx*qw)],
     [2*(qx*qz - qy*qw), 2*(qy*qz + qx*qw), 1 - 2*(qx**2 + qy**2)]])
     p_aruco = R.T @ (p_map - t)
-    print(round(p_aruco[0]), round(p_aruco[1]), round(p_aruco[2]))
+    print(round(p_aruco[0], 3), round(p_aruco[1], 3), round(p_aruco[2], 3))
 
 
 def main():
