@@ -1,8 +1,5 @@
-import rospy
-import tf
-from geometry_msgs.msg import PointStamped
-import tf.transformations as tft
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 
 
 def get_data():
@@ -11,18 +8,15 @@ def get_data():
     x, y, z = map(float, input().split())
     return (tx, ty, tz), (qx, qy, qz, qw), (x, y, z)
 
-def transform(trans, rot, point):
-    R = tft.quaternion_matrix(rot)  
-    R[0:3, 3] = trans 
-    R_inv = np.linalg.inv(R)
-    p_homog = np.array([xm, ym, zm, 1.0])
-    p_aruco_homog = R_inv @ p_homog
-    p_aruco = p_aruco_homog[:3]
-    print(f"{p_aruco[0]:.3f} {p_aruco[1]:.3f} {p_aruco[2]:.3f}")
+def transform(v, q, p):
+    t = np.array([t[0], t[1], t[2]])
+    p_map = np.array([p[0], p[1], p[2]])
+    rotation = R.from_quat([q[0], q[1], q[2], q[3]])
+    point = rotation.inv().apply(p_map - t)
+    print(round(point[0]), round(point[1]), round(point[2]))
 
 
 def main():
-    rospy.init_node('task')
     v, q, p = get_data()
     transform(v, q, p)
 
