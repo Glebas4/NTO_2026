@@ -20,7 +20,6 @@ class pipe:
         self.pose = Pose()
         self.pose.position = Point(self.x, self.y, 0)
     
-
     def spawn(self):
         with open(self.path, 'r') as f:
             sdf_file = f.read()
@@ -42,8 +41,8 @@ def gen_points():
     points = []
     while len(points) < 5:
         x = random.choice([1, -1])
-        y = round(random.uniform(1.05, 8.95), 1)
-        if all(abs(point[1] - y) >=0.75 for point in points): 
+        y = round(random.uniform(1.05, 8.95))
+        if all(abs(point[1] - y) >= 0.75 for point in points): 
             points.append((x, y))
 
     return points
@@ -51,6 +50,7 @@ def gen_points():
 
 def main():
     points = gen_points()
+
     pipe_main = pipe(1, 1, path+"_main/pipe_main.sdf", "pipe_main")
     ps1 = pipe(points[0][0], points[0][1], path+"_small/pipe_small.sdf", "pipe_small_1")
     ps2 = pipe(points[1][0], points[1][1], path+"_small/pipe_small.sdf", "pipe_small_2")
@@ -73,7 +73,6 @@ def main():
         ps3.spawn()
         ps4.spawn()
         ps5.spawn()
-
 
 
 if __name__ == '__main__':
