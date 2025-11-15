@@ -41,7 +41,7 @@ def gen_points():
     points = []
     while len(points) < 5:
         x = random.choice([1, -1])
-        y = round(random.uniform(1.05, 8.95))
+        y = round(random.uniform(1.05, 8.95), 2)
         if all(abs(point[1] - y) >= 0.75 for point in points): 
             points.append((x, y))
 
