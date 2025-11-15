@@ -37,11 +37,11 @@ class pipe:
 
 
 def main():
-    pipe = pipe(1, 1, path+"/pipe.sdf", "pipe_main")
+    pipe_main = pipe(1, 1, path+"/pipe.sdf", "pipe_main")
     if len(sys.argv)>1:
-        pipe.delete()
+        pipe_main.delete()
     else:
-        pipe.spawn()
+        pipe_main.spawn()
 
 
 
