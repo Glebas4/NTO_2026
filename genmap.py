@@ -15,6 +15,7 @@ class pipe:
         self.x = x
         self.y = y
         self.z = 0
+        self.name = name
         self.path = path
         self.pose = Pose()
         self.pose.position = Point(self.x, self.y, self.z)
