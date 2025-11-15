@@ -18,7 +18,7 @@ class pipe:
         self.name = name
         self.path = path
         self.pose = Pose()
-        self.pose.position = Point(self.x, self.y, self.z)
+        self.pose.position = Point(self.x, self.y, 0)
     
 
     def spawn(self):
