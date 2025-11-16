@@ -16,7 +16,7 @@ path = "/home/clover/catkin_ws/src/sitl_gazebo/models/pipe"
 
 
 class pipe:
-    def __init__(self, x, y, path, name, angle):
+    def __init__(self, x=0, y=0, path=0, name=0, angle=0):
         self.x = x
         self.y = y
 
@@ -80,12 +80,12 @@ def gen_pipes(l): #l - длина трубы
 
 def main():
     if len(sys.argv)>1:
-        ps1 = pipe(name="ps1")
-        ps2 = pipe(name="ps2")
-        ps3 = pipe(name="ps3")
-        ps4 = pipe(name="ps4")
-        ps5 = pipe(name="ps5")
-        ps6 = pipe(name="ps6")
+        ps1 = pipe(name="pipe_main")
+        ps2 = pipe(name="pipe_rot")
+        ps3 = pipe(name="pipe_small_1")
+        ps4 = pipe(name="pipe_small_2")
+        ps5 = pipe(name="pipe_small_3")
+        ps6 = pipe(name="pipe_small_4")
         #pipe_main.delete()
         #pipe_rot.delete()
         ps1.delete()
@@ -105,10 +105,10 @@ def main():
     #ps1 - pipe_small №1
         ps1 = pipe(pmain_cords[0], pmain_cords[1], path+"_small/pipe_small.sdf", "pipe_main", pmain_cords[2])
         ps2 = pipe(prot_cords[0], prot_cords[1], path+"_small/pipe_small.sdf", "pipe_rot", prot_cords[2])
-        ps3 = pipe(pnt_pipe_main[0][0], pnt_pipe_main[0][1], path+"_small/pipe_small.sdf", "pipe_small_3", pmain_cords[2]-1.8)
-        ps4 = pipe(pnt_pipe_main[1][0], pnt_pipe_main[1][1], path+"_small/pipe_small.sdf", "pipe_small_4", pmain_cords[2]-1.8)
-        ps5 = pipe(pnt_pipe_rot[0][0], pnt_pipe_rot[0][1], path+"_small/pipe_small.sdf", "pipe_small_5", prot_cords[2]-1.8)
-        ps6 = pipe(pnt_pipe_rot[1][0], pnt_pipe_rot[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", prot_cords[2]-1.8)
+        ps3 = pipe(pnt_pipe_main[0][0], pnt_pipe_main[0][1], path+"_small/pipe_small.sdf", "pipe_small_1", pmain_cords[2]-1.8)
+        ps4 = pipe(pnt_pipe_main[1][0], pnt_pipe_main[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", pmain_cords[2]-1.8)
+        ps5 = pipe(pnt_pipe_rot[0][0], pnt_pipe_rot[0][1], path+"_small/pipe_small.sdf", "pipe_small_3", prot_cords[2]-1.8)
+        ps6 = pipe(pnt_pipe_rot[1][0], pnt_pipe_rot[1][1], path+"_small/pipe_small.sdf", "pipe_small_4", prot_cords[2]-1.8)
 
         ps1.spawn()
         ps2.spawn()
