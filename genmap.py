@@ -60,7 +60,7 @@ def main():
     rot_angle = random.randint(-30, 30)
 
     pipe_main = pipe(1, 1, path+"_main/pipe_main.sdf", "pipe_main", main_angle)
-    pipe_rot = pipe(3, 3, path+"_main/pipe_main.sdf", "pipe_main", main_angle)
+    pipe_rot = pipe(3, 3, path+"_main/pipe_main.sdf", "pipe_rot", rot_angle)
 
     ps1 = pipe(points[0][0], points[0][1], path+"_small/pipe_small.sdf", "pipe_small_1")
     ps2 = pipe(points[1][0], points[1][1], path+"_small/pipe_small.sdf", "pipe_small_2")
