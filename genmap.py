@@ -78,8 +78,8 @@ def main():
     #pipe_rot = pipe(prot_cords[0], prot_cords[1], path+"_main/pipe_main.sdf", "pipe_rot", pmain_cords[3])
 
     #ps1 - pipe_small №1
-    ps1 = pipe(pmain_cords[0], pmain_cords[1], path+"_small/pipe_small.sdf", "pipe_main", pmain_cords[3])
-    ps2 = pipe(prot_cords[0], prot_cords[1], path+"_small/pipe_small.sdf", "pipe_rot", pmain_cords[3])
+    ps1 = pipe(pmain_cords[0], pmain_cords[1], path+"_small/pipe_small.sdf", "pipe_main", pmain_cords[2])
+    ps2 = pipe(prot_cords[0], prot_cords[1], path+"_small/pipe_small.sdf", "pipe_rot", pmain_cords[2])
     #ps3 = pipe(points[2][0], points[2][1], path+"_small/pipe_small.sdf", "pipe_small_3")
     #ps4 = pipe(points[3][0], points[3][1], path+"_small/pipe_small.sdf", "pipe_small_4")
     #ps5 = pipe(points[4][0], points[4][1], path+"_small/pipe_small.sdf", "pipe_small_5")
