@@ -61,11 +61,11 @@ def gen_points():
 def gen_pipes(l): #l - длина трубы
     #Чтобы угол меж основной трубой и врезкой был <= 30,то диапазон угла между ними будет равен разнице смещения и 30 градусов
     main_angle = random.randint(0, 20)
-    rot_angle = random.randint(main_angle-30, main_angle+30) 
+    rot_angle = random.randint(180-main_angle-30, 180-main_angle+30) 
 
     main_angle = math.radians(main_angle)
-    x = l * math.sin(main_angle) #Смещение второй точки по X и Y 
-    y = l * math.cos(main_angle)
+    x = l * math.sin(main_angle) - 1  #Смещение второй точки по X и Y 
+    y = l * math.cos(main_angle) - 1
     
     return (1, 1, main_angle), (x, y, rot_angle)
 
@@ -79,7 +79,7 @@ def main():
 
     #ps1 - pipe_small №1
     ps1 = pipe(pmain_cords[0], pmain_cords[1], path+"_small/pipe_small.sdf", "pipe_main", pmain_cords[2])
-    ps2 = pipe(prot_cords[0], prot_cords[1], path+"_small/pipe_small.sdf", "pipe_rot", pmain_cords[2])
+    ps2 = pipe(prot_cords[0], prot_cords[1], path+"_small/pipe_small.sdf", "pipe_rot", prot_cords[2])
     #ps3 = pipe(points[2][0], points[2][1], path+"_small/pipe_small.sdf", "pipe_small_3")
     #ps4 = pipe(points[3][0], points[3][1], path+"_small/pipe_small.sdf", "pipe_small_4")
     #ps5 = pipe(points[4][0], points[4][1], path+"_small/pipe_small.sdf", "pipe_small_5")
