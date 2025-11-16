@@ -12,11 +12,12 @@ path = "/home/clover/catkin_ws/src/sitl_gazebo/models/pipe"
 
 
 class pipe:
-    def __init__(self, x, y, path, name):
+    def __init__(self, x, y, path, name, angle=0):
         self.x = x
         self.y = y
         self.name = name
         self.path = path
+        self.angle = angle
         self.pose = Pose()
         self.pose.position = Point(self.x, self.y, 0)
     
@@ -28,8 +29,9 @@ class pipe:
                              model_xml=sdf_file,
                              robot_namespace='',
                              initial_pose=self.pose,
-                             reference_frame="world")
-        print(gen.status_message, self.name, f"x={self.x}; y={self.y}")
+                             reference_frame="world",
+                             Y=self.angle)
+        print(gen.status_message, self.name, f"x={self.x}; y={self.y}; yaw={self.angle}")
 
     def delete(self):
         resp = delete_service(self.name)
@@ -50,8 +52,12 @@ def gen_points():
 
 def main():
     points = gen_points()
+    main_angle = random.randint(-30, 30)
+    rot_angle = random.randint(-30, 30)
 
-    pipe_main = pipe(1, 1, path+"_main/pipe_main.sdf", "pipe_main")
+    pipe_main = pipe(1, 1, path+"_main/pipe_main.sdf", "pipe_main", main_angle)
+    pipe_rot = pipe(3, 3, path+"_main/pipe_main.sdf", "pipe_main", main_angle)
+
     ps1 = pipe(points[0][0], points[0][1], path+"_small/pipe_small.sdf", "pipe_small_1")
     ps2 = pipe(points[1][0], points[1][1], path+"_small/pipe_small.sdf", "pipe_small_2")
     ps3 = pipe(points[2][0], points[2][1], path+"_small/pipe_small.sdf", "pipe_small_3")
@@ -61,18 +67,15 @@ def main():
 
     if len(sys.argv)>1:
         pipe_main.delete()
-        ps1.delete()
-        ps2.delete()
-        ps3.delete()
-        ps4.delete()
-        ps5.delete()
+        pipe_rot.delete()
+        #ps1.delete()
+        #ps2.delete()
+        #ps3.delete()
+        #ps4.delete()
+        #ps5.delete()
     else:
         pipe_main.spawn()
-        ps1.spawn()
-        ps2.spawn()
-        ps3.spawn()
-        ps4.spawn()
-        ps5.spawn()
+        pipe_rot.spawn()
 
 
 if __name__ == '__main__':
