@@ -69,7 +69,7 @@ def main():
     ps5 = pipe(points[4][0], points[4][1], path+"_small/pipe_small.sdf", "pipe_small_5")
 
 
-    if len(sys.argv):
+    if len(sys.argv)>1:
         pipe_main.delete()
         pipe_rot.delete()
         #ps1.delete()
