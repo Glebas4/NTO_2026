@@ -72,7 +72,7 @@ def gen_pipes(l): #l - длина трубы
 
 def main():
     points = gen_points()
-    pmain_cords, prot_cords = gen_pipes(l=3)
+    pmain_cords, prot_cords = gen_pipes(l=1)
 
     #pipe_main = pipe(pmain_cords[0], pmain_cords[1], path+"_main/pipe_main.sdf", "pipe_main", pmain_cords[3])
     #pipe_rot = pipe(prot_cords[0], prot_cords[1], path+"_main/pipe_main.sdf", "pipe_rot", pmain_cords[3])
