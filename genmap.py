@@ -7,6 +7,9 @@ import sys
 import math
 
 
+rospy.init_node("genmap")
+
+
 spawn_service = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
 delete_service = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 path = "/home/clover/catkin_ws/src/sitl_gazebo/models/pipe"
