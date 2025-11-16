@@ -61,14 +61,14 @@ def gen_points():
 def gen_pipes(l): #l - длина трубы
     #Чтобы угол меж основной трубой и врезкой был <= 30,то диапазон угла между ними будет равен разнице смещения и 30 градусов
     #main_angle = random.randint(0, 20)
-    main_angle = 30
+    main_angle = 30 # 30 degrees = 0.3 Yaw
     rot_angle = random.randint(main_angle-30, main_angle+30) 
 
     rad = math.radians(main_angle)
     x = round(l * math.sin(rad), 2) + 1  #Смещение второй точки по X и Y 
     y = round(l * math.cos(rad), 2) + 1
     
-    return (1, 1, main_angle/100), (x, y, rot_angle/100)
+    return (1, 1, -main_angle/100), (x, y, -rot_angle/100)
 
 
 def main():
