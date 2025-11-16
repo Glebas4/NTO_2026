@@ -68,7 +68,7 @@ def gen_pipes(l): #l - длина трубы
     x = round(l * math.sin(rad), 2) + 1  #Смещение второй точки по X и Y 
     y = round(l * math.cos(rad), 2) + 1
     
-    return (1, 1, main_angle), (x, y, rot_angle)
+    return (1, 1, main_angle/10), (x, y, rot_angle/10)
 
 
 def main():
