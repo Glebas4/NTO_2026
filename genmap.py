@@ -1,6 +1,7 @@
 import rospy
 from gazebo_msgs.srv import SpawnModel, DeleteModel
-from geometry_msgs.msg import Pose, Point
+from geometry_msgs.msg import Pose, Point, Quaternion
+import tf.transformations as tft
 import random
 import sys
 import math
@@ -20,6 +21,10 @@ class pipe:
         self.angle = angle
         self.pose = Pose()
         self.pose.position = Point(self.x, self.y, 0)
+
+        if self.angle:
+            self.q = tft.quaternion_from_euler(0, 0, self.angle)
+            self.pose.orientation = Quaternion(*self.q)
     
     def spawn(self):
         with open(self.path, 'r') as f:
@@ -29,8 +34,7 @@ class pipe:
                              model_xml=sdf_file,
                              robot_namespace='',
                              initial_pose=self.pose,
-                             reference_frame="world",
-                             Y=self.angle)
+                             reference_frame="world")
         print(gen.status_message, self.name, f"x={self.x}; y={self.y}; yaw={self.angle}")
 
     def delete(self):
