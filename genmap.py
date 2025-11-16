@@ -55,7 +55,7 @@ def gen_points(x1, x2, y1, y2, n):
         if side:
             x+=0.71
             y+=0.71
-        if all(math.sqrt((point[0] - x)**2 + (point[1] - y)**2) >=1 for point in points): #Если гипотенуза соединяющая точки >=1 то координата довабляется
+        if all(math.sqrt((point[0] - x)**2 + (point[1] - y)**2) >=0.75 for point in points): #Если гипотенуза соединяющая точки >=1 то координата довабляется
             points.append((x, y))
 
     return points
@@ -79,23 +79,13 @@ def gen_pipes(l): #l - длина трубы
 
 
 def main():
-    pmain_cords, prot_cords, prot_end = gen_pipes(l=1)
-    pnt_pipe_main = gen_points(x1=1, x2=prot_cords[0], y1=1, y2=prot_cords[1], n=3)
-    pnt_pipe_rot = gen_points(x1=prot_cords[0], x2=prot_end[0], y1=prot_cords[1], y2=prot_end[1], n=2)
-
-    #pipe_main = pipe(pmain_cords[0], pmain_cords[1], path+"_main/pipe_main.sdf", "pipe_main", pmain_cords[3])
-    #pipe_rot = pipe(prot_cords[0], prot_cords[1], path+"_main/pipe_main.sdf", "pipe_rot", pmain_cords[3])
-
-    #ps1 - pipe_small №1
-    ps1 = pipe(pmain_cords[0], pmain_cords[1], path+"_small/pipe_small.sdf", "pipe_main", pmain_cords[2])
-    ps2 = pipe(prot_cords[0], prot_cords[1], path+"_small/pipe_small.sdf", "pipe_rot", prot_cords[2])
-    ps3 = pipe(pnt_pipe_main[0][0], pnt_pipe_main[0][1], path+"_small/pipe_small.sdf", "pipe_small_3", pmain_cords[2])
-    ps4 = pipe(pnt_pipe_main[1][0], pnt_pipe_main[1][1], path+"_small/pipe_small.sdf", "pipe_small_4", pmain_cords[2])
-    ps5 = pipe(pnt_pipe_rot[0][0], pnt_pipe_rot[0][1], path+"_small/pipe_small.sdf", "pipe_small_5", prot_cords[2])
-    ps6 = pipe(pnt_pipe_rot[1][0], pnt_pipe_rot[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", prot_cords[2])
-
-
     if len(sys.argv)>1:
+        ps1 = pipe(name="ps1")
+        ps2 = pipe(name="ps2")
+        ps3 = pipe(name="ps3")
+        ps4 = pipe(name="ps4")
+        ps5 = pipe(name="ps5")
+        ps6 = pipe(name="ps6")
         #pipe_main.delete()
         #pipe_rot.delete()
         ps1.delete()
@@ -105,6 +95,21 @@ def main():
         ps5.delete()
         ps6.delete()
     else:
+        pmain_cords, prot_cords, prot_end = gen_pipes(l=1)
+        pnt_pipe_main = gen_points(x1=1, x2=prot_cords[0], y1=1, y2=prot_cords[1], n=3)
+        pnt_pipe_rot = gen_points(x1=prot_cords[0], x2=prot_end[0], y1=prot_cords[1], y2=prot_end[1], n=2)
+
+    #pipe_main = pipe(pmain_cords[0], pmain_cords[1], path+"_main/pipe_main.sdf", "pipe_main", pmain_cords[3])
+    #pipe_rot = pipe(prot_cords[0], prot_cords[1], path+"_main/pipe_main.sdf", "pipe_rot", pmain_cords[3])
+
+    #ps1 - pipe_small №1
+        ps1 = pipe(pmain_cords[0], pmain_cords[1], path+"_small/pipe_small.sdf", "pipe_main", pmain_cords[2])
+        ps2 = pipe(prot_cords[0], prot_cords[1], path+"_small/pipe_small.sdf", "pipe_rot", prot_cords[2])
+        ps3 = pipe(pnt_pipe_main[0][0], pnt_pipe_main[0][1], path+"_small/pipe_small.sdf", "pipe_small_3", pmain_cords[2]-1.8)
+        ps4 = pipe(pnt_pipe_main[1][0], pnt_pipe_main[1][1], path+"_small/pipe_small.sdf", "pipe_small_4", pmain_cords[2]-1.8)
+        ps5 = pipe(pnt_pipe_rot[0][0], pnt_pipe_rot[0][1], path+"_small/pipe_small.sdf", "pipe_small_5", prot_cords[2]-1.8)
+        ps6 = pipe(pnt_pipe_rot[1][0], pnt_pipe_rot[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", prot_cords[2]-1.8)
+
         ps1.spawn()
         ps2.spawn()
         ps3.spawn()
