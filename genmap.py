@@ -56,17 +56,17 @@ def gen_points():
 
 def main():
     points = gen_points()
-    main_angle = random.randint(-30, 30)
-    rot_angle = random.randint(-30, 30)
+    main_angle = random.randint(90, 150)
+    rot_angle = random.randint(90, 150)
 
     pipe_main = pipe(1, 1, path+"_main/pipe_main.sdf", "pipe_main", main_angle)
     pipe_rot = pipe(3, 3, path+"_main/pipe_main.sdf", "pipe_rot", rot_angle)
 
-    ps1 = pipe(points[0][0], points[0][1], path+"_small/pipe_small.sdf", "pipe_small_1")
-    ps2 = pipe(points[1][0], points[1][1], path+"_small/pipe_small.sdf", "pipe_small_2")
-    ps3 = pipe(points[2][0], points[2][1], path+"_small/pipe_small.sdf", "pipe_small_3")
-    ps4 = pipe(points[3][0], points[3][1], path+"_small/pipe_small.sdf", "pipe_small_4")
-    ps5 = pipe(points[4][0], points[4][1], path+"_small/pipe_small.sdf", "pipe_small_5")
+    #ps1 = pipe(points[0][0], points[0][1], path+"_small/pipe_small.sdf", "pipe_small_1")
+    #ps2 = pipe(points[1][0], points[1][1], path+"_small/pipe_small.sdf", "pipe_small_2")
+    #ps3 = pipe(points[2][0], points[2][1], path+"_small/pipe_small.sdf", "pipe_small_3")
+    #ps4 = pipe(points[3][0], points[3][1], path+"_small/pipe_small.sdf", "pipe_small_4")
+    #ps5 = pipe(points[4][0], points[4][1], path+"_small/pipe_small.sdf", "pipe_small_5")
 
 
     if len(sys.argv)>1:
