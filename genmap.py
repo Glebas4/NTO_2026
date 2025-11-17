@@ -75,7 +75,7 @@ def gen_pipes(l): #l - длина трубы
 
     #0.95 тк радиус трубы 5 см и нужно чтобы она не выпирала
     #Начало и угол осн трубы; Начало 2ой трубы(конец 1ой) и угол; конец 2 трубы
-    return (1, 1, -main_angle/50), (x+1, y+1, -rot_angle/50), (x, y)
+    return (1, 1, -main_angle/50), (x+1, y+1, -rot_angle/50), (x, y) (-main_angle, -rot_angle)
 
 
 def main():
@@ -97,9 +97,9 @@ def main():
         #ps5.delete()
     else:
         points = []
-        pmain_cords, prot_cords, prot_end = gen_pipes(l=3)
-        pnt_pipe_main = gen_points(x1=1, x2=prot_cords[0], y1=1, y2=prot_cords[1], n=3, points=points, )
-        pnt_pipe_rot = gen_points(x1=prot_cords[0], x2=prot_end[0], y1=prot_cords[1], y2=prot_end[1], n=2, points=points)
+        pmain_cords, prot_cords, prot_end, angls = gen_pipes(l=3)
+        pnt_pipe_main = gen_points(x1=1, x2=prot_cords[0], y1=1, y2=prot_cords[1], n=3, points=points, angle=angls[0])
+        pnt_pipe_rot = gen_points(x1=prot_cords[0], x2=prot_end[0], y1=prot_cords[1], y2=prot_end[1], n=2, points=points, angle=angls[1])
 
     #pipe_main = pipe(pmain_cords[0], pmain_cords[1], path+"_main/pipe_main.sdf", "pipe_main", pmain_cords[3])
     #pipe_rot = pipe(prot_cords[0], prot_cords[1], path+"_main/pipe_main.sdf", "pipe_rot", pmain_cords[3])
