@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 4.5.4 LTS commit date:2025-10-27, commit time:12:46, hash:b3efe983cc58</authoring_tool>
     </contributor>
-    <created>2025-11-17T17:59:42</created>
-    <modified>2025-11-17T17:59:42</modified>
+    <created>2025-11-17T18:12:24</created>
+    <modified>2025-11-17T18:12:24</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -82,7 +82,7 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="NurbsPath" name="NurbsPath" type="NODE">
-        <matrix sid="transform">-3.27835e-8 0.2499999 0 0 -0.7500001 -1.09278e-8 0 1.5 0 0 0 0 0 0 0 1</matrix>
+        <matrix sid="transform">-3.27835e-8 0.4999999 0 0 -0.7500001 -2.18557e-8 0 1.5 0 0 0.02499999 0.005 0 0 0 1</matrix>
         <instance_geometry url="#NurbsPath-mesh" name="NurbsPath">
           <bind_material>
             <technique_common>
