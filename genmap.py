@@ -15,7 +15,7 @@ spawn_service = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
 delete_service = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 path = "/home/clover/catkin_ws/src/sitl_gazebo/models/pipe"
 
-points = np.array()
+points = []
 main_pipe_angle = 0
 main_pipe_start_x = 1
 main_pipe_start_y = 1
@@ -61,15 +61,18 @@ class pipe:
 
 def gen_points(x1, x2, y1, y2, n, angle):
     global points
-    p1 = np.array(x1, y1)
-    p2 = np.array(x2, y2)
+    pnts = []
+    p1 = np.array([x1, y1])
+    p2 = np.array([x2, y2])
     vector = p2 - p1
     while len(points) != n:
         t = random.uniform(0, 1)
         point = p1 + t * vector
         if all(np.linalg.norm(point - pnt) >=0.75 for pnt in points): #Расстояние между точками
+            pnts.append(point)
             points.append(point)
-        points.append(point)
+    
+    return pnts
 
 
 def gen_pipes(l): #l - длина трубы
