@@ -128,7 +128,7 @@ def main():
         ps2.spawn()
         ps3.spawn()
         ps4.spawn()
-        ps4.spawn()
+        ps5.spawn()
 
 
 if __name__ == '__main__':
