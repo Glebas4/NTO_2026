@@ -16,7 +16,7 @@
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>model://my_pipe/meshes/pipe_main.dae</uri>
+            <uri>model://pipe_main/meshes/pipe_main.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
