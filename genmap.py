@@ -7,7 +7,9 @@ import sys
 import math
 import numpy as np
 
+
 rospy.init_node("genmap")
+
 
 spawn_service = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
 delete_service = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
@@ -23,6 +25,7 @@ main_pipe_end_y = 0
 rot_pipe_angle = 0
 rot_pipe_end_x = 0
 rot_pipe_end_y = 0
+
 
 
 class pipe:
@@ -112,15 +115,16 @@ def main():
         prot  = pipe(main_pipe_end_x, main_pipe_end_y, path+"_main/pipe_main.sdf", "pipe_rot", rot_pipe_angle)
         ps1   = pipe(main_pipe_vrezki[0][0], main_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_1", main_pipe_angle-1.8) #1.8 Yaw Gazebo = 90 градусов
         ps2   = pipe(main_pipe_vrezki[1][0], main_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", main_pipe_angle-1.8)
-        ps2   = pipe(main_pipe_vrezki[2][0], main_pipe_vrezki[2][1], path+"_small/pipe_small.sdf", "pipe_small_3", main_pipe_angle-1.8)
-        ps3   = pipe(rot_pipe_vrezki[0][0], rot_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_4", rot_pipe_angle-1.8)
-        ps4   = pipe(rot_pipe_vrezki[1][0], rot_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_5", rot_pipe_angle-1.8)
+        ps3   = pipe(main_pipe_vrezki[2][0], main_pipe_vrezki[2][1], path+"_small/pipe_small.sdf", "pipe_small_3", main_pipe_angle-1.8)
+        ps4   = pipe(rot_pipe_vrezki[0][0], rot_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_4", rot_pipe_angle-1.8)
+        ps5   = pipe(rot_pipe_vrezki[1][0], rot_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_5", rot_pipe_angle-1.8)
 
         pmain.spawn()
         prot.spawn()
         ps1.spawn()
         ps2.spawn()
         ps3.spawn()
+        ps4.spawn()
         ps4.spawn()
 
 
