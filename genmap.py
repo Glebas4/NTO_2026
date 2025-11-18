@@ -75,7 +75,7 @@ def gen_pipes(l): #l - длина трубы
 
     #0.95 тк радиус трубы 5 см и нужно чтобы она не выпирала
     #Начало и угол осн трубы; Начало 2ой трубы(конец 1ой) и угол; конец 2 трубы
-    return (1, 1, -main_angle/50), (x+1, y+1, -rot_angle/50), (x, y) (-main_angle, -rot_angle)
+    return (1, 1, -main_angle/50), (x+1, y+1, -rot_angle/50), (x, y), (-main_angle, -rot_angle)
 
 
 def main():
