@@ -5,15 +5,24 @@ import tf.transformations as tft
 import random
 import sys
 import math
-
+import numpy as np
 
 rospy.init_node("genmap")
-
 
 spawn_service = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
 delete_service = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 path = "/home/clover/catkin_ws/src/sitl_gazebo/models/pipe"
-points = []
+
+points = np.array()
+main_pipe_angle = 0
+main_pipe_start_x = 1
+main_pipe_start_y = 1
+main_pipe_end_x = 0
+main_pipe_end_y = 0
+
+rot_pipe_angle = 0
+rot_pipe_end_x = 0
+rot_pipe_end_y = 0
 
 
 class pipe:
@@ -49,36 +58,31 @@ class pipe:
 
 def gen_points(x1, x2, y1, y2, n, angle):
     global points
-    pnts = points
-    angle = math.radians(angle)
-    yc = math.cos(angle)
-    xc = math.sin(angle)
-    while len(pnts) != n:
-        x = round(random.uniform(x1, x2), 2)
-        y = round(random.uniform(y1, y2), 2)
-        side = random.choice([True, False])
-        if side:
-            x-=xc
-            y-=yc
-        if all(math.sqrt((pnt[0] - x)**2 + (pnt[1] - y)**2) >=0.75 for pnt in pnts): #Если гипотенуза соединяющая точки >=1 то координата довабляется
-            pnts.append((x, y))
-
-    return pnts
+    p1 = np.array(x1, y1)
+    p2 = np.array(x2, y2)
+    vector = p2 - p1
+    while len(points) != n:
+        t = random.uniform(0, 1)
+        point = p1 + t * vector
+        if all(np.linalg.norm(point - pnt) >=0.75 for pnt in points): #Расстояние между точками
+            points.append(point)
+        points.append(point)
 
 
 def gen_pipes(l): #l - длина трубы
     #Чтобы угол меж основной трубой и врезкой был <= 30,то диапазон угла между ними будет равен разнице смещения и 30 градусов
-    main_angle = random.randint(0, 20)
+    global rot_pipe_angle, main_pipe_angle, main_pipe_end_x, main_pipe_end_y, rot_pipe_end_x, rot_pipe_end_y
+    main_pipe_angle = random.randint(0, 20)
     #main_angle = 30 # 30 degrees = 0.6 Yaw Gazebo
-    rot_angle = random.randint(main_angle-30, main_angle+30) 
+    rot_pipe_angle = random.randint(main_pipe_angle-30, main_pipe_angle+30) 
+    rad = math.radians(main_pipe_angle)
+    main_pipe_end_x = l * math.sin(rad) + 1  #Смещение второй точки по X и Y 
+    main_pipe_end_y = l * math.cos(rad) + 1
 
-    rad = math.radians(main_angle)
-    x = l * math.sin(rad) #Смещение второй точки по X и Y 
-    y = l * math.cos(rad)  #По идее 1,но лучше 0.95
+    rad2 = math.radians(rot_pipe_angle)
+    rot_pipe_end_x = l * math.sin(rad2) + main_pipe_angle
+    rot_pipe_end_y = l * math.cos(rad2) + main_pipe_end_y
 
-    #0.95 тк радиус трубы 5 см и нужно чтобы она не выпирала
-    #Начало и угол осн трубы; Начало 2ой трубы(конец 1ой) и угол; конец 2 трубы
-    return (1, 1, -main_angle/50), (x+1, y+1, -rot_angle/50), (x, y), (-main_angle, -rot_angle)
 
 
 def main():
@@ -86,45 +90,38 @@ def main():
     if len(sys.argv)>1:
         pmain =  pipe(name="pipe_main")
         prot  =  pipe(name="pipe_rot")
-        #ps1   =  pipe(name="pipe_small_1")
-        #ps2   =  pipe(name="pipe_small_2")
-        #ps3   =  pipe(name="pipe_small_3")
-        #ps4   =  pipe(name="pipe_small_4")
-        #ps5   =  pipe(name="pipe_small_5")
+        ps1   =  pipe(name="pipe_small_1")
+        ps2   =  pipe(name="pipe_small_2")
+        ps3   =  pipe(name="pipe_small_3")
+        ps4   =  pipe(name="pipe_small_4")
+        ps5   =  pipe(name="pipe_small_5")
     
         pmain.delete()
         prot.delete()
-        #ps1.delete()
-        #ps2.delete()
-        #ps3.delete()
-        #ps4.delete()
-        #ps5.delete()
+        ps1.delete()
+        ps2.delete()
+        ps3.delete()
+        ps4.delete()
+        ps5.delete()
     else:
-        pmain_cords, prot_cords, prot_end, angls = gen_pipes(l=3)
-        #main_pnts = gen_points(x1=1, x2=prot_cords[0], y1=1, y2=prot_cords[1], n=3, angle=angls[0])
-        #rot_pnts = gen_points(x1=prot_cords[0], x2=prot_end[0], y1=prot_cords[1], y2=prot_end[1], n=2, angle=angls[1])
+        gen_pipes(l=3)
+        main_pipe_vrezki = gen_points(x1=main_pipe_start_x, x2=main_pipe_end_x, y1=main_pipe_start_y, y2=main_pipe_end_y, n=3, angle=main_pipe_angle)
+        rot_pipe_vrezki  = gen_points(x1=main_pipe_end_x, x2=rot_pipe_end_x, y1=main_pipe_end_y, y2=rot_pipe_end_y, n=2, angle=rot_pipe_angle)
 
-    #pipe_main = pipe(pmain_cords[0], pmain_cords[1], path+"_main/pipe_main.sdf", "pipe_main", pmain_cords[3])
-    #pipe_rot = pipe(prot_cords[0], prot_cords[1], path+"_main/pipe_main.sdf", "pipe_rot", pmain_cords[3])
-
-    #ps1 - pipe_small №1
-        pmain = pipe(pmain_cords[0], pmain_cords[1], path+"_main/pipe_main.sdf", "pipe_main", pmain_cords[2])
-        prot = pipe(prot_cords[0], prot_cords[1], path+"_main/pipe_main.sdf", "pipe_rot", prot_cords[2])
-        #ps1 = pipe(pnt_pipe_main[0][0], pnt_pipe_main[0][1], path+"_small/pipe_small.sdf", "pipe_small_1", pmain_cords[2]-1.8)
-        #ps2 = pipe(pnt_pipe_main[1][0], pnt_pipe_main[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", pmain_cords[2]-1.8)
-        #ps3 = pipe(pnt_pipe_rot[0][0],  pnt_pipe_rot[0][1],  path+"_small/pipe_small.sdf", "pipe_small_3", prot_cords[2]-1.8)
-        #ps4 = pipe(pnt_pipe_rot[1][0],  pnt_pipe_rot[1][1],  path+"_small/pipe_small.sdf", "pipe_small_4", prot_cords[2]-1.8)
+        pmain = pipe(main_pipe_start_x, main_pipe_start_y, path+"_main/pipe_main.sdf", "pipe_main", main_pipe_angle)
+        prot  = pipe(main_pipe_end_x, main_pipe_end_y, path+"_main/pipe_main.sdf", "pipe_rot", rot_pipe_angle)
+        ps1   = pipe(main_pipe_vrezki[0][0], main_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_1", main_pipe_angle-1.8) #1.8 Yaw Gazebo = 90 градусов
+        ps2   = pipe(main_pipe_vrezki[1][0], main_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", main_pipe_angle-1.8)
+        ps2   = pipe(main_pipe_vrezki[2][0], main_pipe_vrezki[2][1], path+"_small/pipe_small.sdf", "pipe_small_3", main_pipe_angle-1.8)
+        ps3   = pipe(rot_pipe_vrezki[0][0], rot_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_4", rot_pipe_angle-1.8)
+        ps4   = pipe(rot_pipe_vrezki[1][0], rot_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_5", rot_pipe_angle-1.8)
 
         pmain.spawn()
-        rospy.sleep(5)
         prot.spawn()
-        rospy.sleep(5)
-        #ps1.spawn()
-        #ps2.spawn()
-        #ps3.spawn()
-        #ps4.spawn()
-        #pipe_main.spawn()
-        #pipe_rot.spawn()
+        ps1.spawn()
+        ps2.spawn()
+        ps3.spawn()
+        ps4.spawn()
 
 
 if __name__ == '__main__':
