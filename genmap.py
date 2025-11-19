@@ -59,13 +59,13 @@ class pipe:
         print(resp.status_message, self.name)
 
 
-def gen_points(x1, x2, y1, y2, n, angle):
+def gen_points(x1, x2, y1, y2, n):
     global points
     pnts = []
     p1 = np.array([x1, y1])
     p2 = np.array([x2, y2])
     vector = p2 - p1
-    while len(points) != n:
+    while len(pnts) != n:
         t = random.uniform(0, 1)
         point = p1 + t * vector
         if all(np.linalg.norm(point - pnt) >=0.75 for pnt in points): #Расстояние между точками
@@ -101,37 +101,37 @@ def main():
         prot  =  pipe(name="pipe_rot")
         ps1   =  pipe(name="pipe_small_1")
         ps2   =  pipe(name="pipe_small_2")
-        #ps3   =  pipe(name="pipe_small_3")
-        #ps4   =  pipe(name="pipe_small_4")
-        #ps5   =  pipe(name="pipe_small_5")
+        ps3   =  pipe(name="pipe_small_3")
+        ps4   =  pipe(name="pipe_small_4")
+        ps5   =  pipe(name="pipe_small_5")
     
         pmain.delete()
         prot.delete()
         ps1.delete()
         ps2.delete()
-        #ps3.delete()
-        #ps4.delete()
-        #ps5.delete()
+        ps3.delete()
+        ps4.delete()
+        ps5.delete()
     else:
         gen_pipes(l=3)
-        main_pipe_vrezki = gen_points(x1=main_pipe_start_x, x2=main_pipe_end_x, y1=main_pipe_start_y, y2=main_pipe_end_y, n=2, angle=main_pipe_angle)
-        #rot_pipe_vrezki  = gen_points(x1=main_pipe_end_x, x2=rot_pipe_end_x, y1=main_pipe_end_y, y2=rot_pipe_end_y, n=2, angle=rot_pipe_angle)
+        main_pipe_vrezki = gen_points(x1=main_pipe_start_x, x2=main_pipe_end_x, y1=main_pipe_start_y, y2=main_pipe_end_y, n=3, angle=main_pipe_angle)
+        rot_pipe_vrezki  = gen_points(x1=main_pipe_end_x, x2=rot_pipe_end_x, y1=main_pipe_end_y, y2=rot_pipe_end_y, n=2, angle=rot_pipe_angle)
 
         pmain = pipe(main_pipe_start_x, main_pipe_start_y, path+"_main/pipe_main.sdf", "pipe_main", main_pipe_angle)
         prot  = pipe(main_pipe_end_x, main_pipe_end_y, path+"_main/pipe_main.sdf", "pipe_rot", rot_pipe_angle)
         ps1   = pipe(main_pipe_vrezki[0][0], main_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_1", main_pipe_angle-1.8) #1.8 Yaw Gazebo = 90 градусов
         ps2   = pipe(main_pipe_vrezki[1][0], main_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", main_pipe_angle-1.8)
-        #ps3   = pipe(main_pipe_vrezki[2][0], main_pipe_vrezki[2][1], path+"_small/pipe_small.sdf", "pipe_small_3", main_pipe_angle-1.8)
-        #ps4   = pipe(rot_pipe_vrezki[0][0], rot_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_4", rot_pipe_angle-1.8)
-        #ps5   = pipe(rot_pipe_vrezki[1][0], rot_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_5", rot_pipe_angle-1.8)
+        ps3   = pipe(main_pipe_vrezki[2][0], main_pipe_vrezki[2][1], path+"_small/pipe_small.sdf", "pipe_small_3", main_pipe_angle-1.8)
+        ps4   = pipe(rot_pipe_vrezki[0][0], rot_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_4", rot_pipe_angle-1.8)
+        ps5   = pipe(rot_pipe_vrezki[1][0], rot_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_5", rot_pipe_angle-1.8)
 
         pmain.spawn()
         prot.spawn()
         ps1.spawn()
         ps2.spawn()
-        #ps3.spawn()
-        #ps4.spawn()
-        #ps5.spawn()
+        ps3.spawn()
+        ps4.spawn()
+        ps5.spawn()
 
 
 if __name__ == '__main__':
