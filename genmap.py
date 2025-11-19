@@ -86,7 +86,7 @@ def gen_pipes(l): #l - длина трубы
     main_pipe_end_y = l * math.cos(rad) + 1
 
     rad2 = math.radians(rot_pipe_angle)
-    rot_pipe_end_x = l * math.sin(rad2) + main_pipe_angle
+    rot_pipe_end_x = l * math.sin(rad2) + main_pipe_end_x
     rot_pipe_end_y = l * math.cos(rad2) + main_pipe_end_y
 
     main_pipe_angle = -main_pipe_angle/50
@@ -119,11 +119,11 @@ def main():
 
         pmain = pipe(main_pipe_start_x, main_pipe_start_y, path+"_main/pipe_main.sdf", "pipe_main", main_pipe_angle)
         prot  = pipe(main_pipe_end_x, main_pipe_end_y, path+"_main/pipe_main.sdf", "pipe_rot", rot_pipe_angle)
-        ps1   = pipe(main_pipe_vrezki[0][0], main_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_1", main_pipe_angle-1.8) #1.8 Yaw Gazebo = 90 градусов
-        ps2   = pipe(main_pipe_vrezki[1][0], main_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", main_pipe_angle-1.8)
-        ps3   = pipe(main_pipe_vrezki[2][0], main_pipe_vrezki[2][1], path+"_small/pipe_small.sdf", "pipe_small_3", main_pipe_angle-1.8)
-        ps4   = pipe(rot_pipe_vrezki[0][0], rot_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_4", rot_pipe_angle-1.8)
-        ps5   = pipe(rot_pipe_vrezki[1][0], rot_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_5", rot_pipe_angle-1.8)
+        ps1   = pipe(main_pipe_vrezki[0][0], main_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_1", main_pipe_angle-1.5) #1.8 Yaw Gazebo = 90 градусов
+        ps2   = pipe(main_pipe_vrezki[1][0], main_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_2", main_pipe_angle-1.5)
+        ps3   = pipe(main_pipe_vrezki[2][0], main_pipe_vrezki[2][1], path+"_small/pipe_small.sdf", "pipe_small_3", main_pipe_angle-1.5)
+        ps4   = pipe(rot_pipe_vrezki[0][0], rot_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_4", rot_pipe_angle-1.5)
+        ps5   = pipe(rot_pipe_vrezki[1][0], rot_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_5", rot_pipe_angle-1.5)
 
         pmain.spawn()
         prot.spawn()
