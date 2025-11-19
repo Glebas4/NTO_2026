@@ -17,7 +17,7 @@ set_position = rospy.ServiceProxy('set_position', srv.SetPosition)
 set_velocity = rospy.ServiceProxy('set_velocity', srv.SetVelocity)
 land = rospy.ServiceProxy('land', Trigger)
 bridge = CvBridge()
-image_pub = rospy.Publisher('binary', Image)
+image_pub = rospy.Publisher('binary', Image, queue_size=1)
 
 yellow_low = (220, 220, 78)
 yellow_up = (228, 228, 86)
@@ -45,7 +45,7 @@ def image_callback(data):
 
 
 def main():
-    navigate_wait(0, 0, 1, frame_id="body")
+    navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
     navigate_wait(1, 1, 1)
 
 
