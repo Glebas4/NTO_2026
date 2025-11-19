@@ -53,3 +53,4 @@ def main():
 if __name__ == '__main__':
     main()
     image_sub = rospy.Subscriber('main_camera/image_raw', Image, image_callback)
+    rospy.spin()
