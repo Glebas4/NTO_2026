@@ -40,7 +40,7 @@ def image_callback(data):
     img = bridge.imgmsg_to_cv2(data, 'bgr8') 
     bin = cv.inRange(img, yellow_low, yellow_up)
     
-    img_morph = cv.morphologyEx(img, cv.MORPH_OPEN, kernel, iterations=1)
+    img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
 
     contours, _ = cv.findContours(img_morph, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     largest_contour = max(contours, key=cv.contourArea)
