@@ -114,8 +114,8 @@ def main():
         ps5.delete()
     else:
         gen_pipes(l=3)
-        main_pipe_vrezki = gen_points(x1=main_pipe_start_x, x2=main_pipe_end_x, y1=main_pipe_start_y, y2=main_pipe_end_y, n=3, angle=main_pipe_angle)
-        rot_pipe_vrezki  = gen_points(x1=main_pipe_end_x, x2=rot_pipe_end_x, y1=main_pipe_end_y, y2=rot_pipe_end_y, n=2, angle=rot_pipe_angle)
+        main_pipe_vrezki = gen_points(x1=main_pipe_start_x, x2=main_pipe_end_x, y1=main_pipe_start_y, y2=main_pipe_end_y, n=3)
+        rot_pipe_vrezki  = gen_points(x1=main_pipe_end_x, x2=rot_pipe_end_x, y1=main_pipe_end_y, y2=rot_pipe_end_y, n=2)
 
         pmain = pipe(main_pipe_start_x, main_pipe_start_y, path+"_main/pipe_main.sdf", "pipe_main", main_pipe_angle)
         prot  = pipe(main_pipe_end_x, main_pipe_end_y, path+"_main/pipe_main.sdf", "pipe_rot", rot_pipe_angle)
