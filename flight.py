@@ -22,6 +22,8 @@ image_pub = rospy.Publisher('binary', Image, queue_size=1)
 
 yellow_low = (78, 220, 220)
 yellow_up = (86, 228, 228)
+kernel_size = (5, 5) 
+kernel = cv.getStructuringElement(cv.MORPH_RECT, kernel_size)
 
 def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
     navigate(x=x, y=y, z=z, yaw=yaw, speed=speed, frame_id=frame_id, auto_arm=auto_arm)
@@ -38,16 +40,9 @@ def image_callback(data):
     img = bridge.imgmsg_to_cv2(data, 'bgr8') 
     bin = cv.inRange(img, yellow_low, yellow_up)
     
-    num_labels, labels, stats, _ = cv.connectedComponentsWithStats(bin, 8, cv.CV_32S)
-    mask = np.zeros(bin.shape, dtype="uint8")
-    for i in range(1, num_labels):
-        area = stats[i, cv.CC_STAT_AREA]
+    img_morph = cv.morphologyEx(img, cv.MORPH_OPEN, kernel, iterations=1)
 
-        # Если площадь больше заданного порога, добавляем ее в маску
-        if area >= 100:
-            mask[labels == i] = 255
-
-    contours, _ = cv.findContours(mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv.findContours(img_morph, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     largest_contour = max(contours, key=cv.contourArea)
     x, y, w, h = cv.boundingRect(largest_contour)
     
