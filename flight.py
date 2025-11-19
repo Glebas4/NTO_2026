@@ -19,8 +19,8 @@ land = rospy.ServiceProxy('land', Trigger)
 bridge = CvBridge()
 image_pub = rospy.Publisher('binary', Image, queue_size=1)
 
-yellow_low = (220, 220, 78)
-yellow_up = (228, 228, 86)
+yellow_low = (78, 220, 220)
+yellow_up = (86, 228, 228)
 
 def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
     navigate(x=x, y=y, z=z, yaw=yaw, speed=speed, frame_id=frame_id, auto_arm=auto_arm)
