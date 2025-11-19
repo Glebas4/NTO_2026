@@ -6,6 +6,7 @@ import cv2 as cv
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import math
+import numpy as np
 
 rospy.init_node('flight')
 
@@ -36,7 +37,17 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
 def image_callback(data):
     img = bridge.imgmsg_to_cv2(data, 'bgr8') 
     bin = cv.inRange(img, yellow_low, yellow_up)
-    contours, hierarchy = cv.findContours(bin, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    
+    num_labels, labels, stats, _ = cv.connectedComponentsWithStats(bin, 8, cv.CV_32S)
+    mask = np.zeros(bin.shape, dtype="uint8")
+    for i in range(1, num_labels):
+        area = stats[i, cv.CC_STAT_AREA]
+
+        # Если площадь больше заданного порога, добавляем ее в маску
+        if area >= 100:
+            mask[labels == i] = 255
+
+    contours, _ = cv.findContours(mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     largest_contour = max(contours, key=cv.contourArea)
     x, y, w, h = cv.boundingRect(largest_contour)
     
