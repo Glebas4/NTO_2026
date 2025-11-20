@@ -88,8 +88,8 @@ def gen_pipes(l): #l - длина трубы
     rot_pipe_end_x = l * math.sin(rad2) + main_pipe_end_x
     rot_pipe_end_y = l * math.cos(rad2) + main_pipe_end_y
 
-    main_pipe_angle = -main_pipe_angle/50.3
-    rot_pipe_angle = -rot_pipe_angle/50.3
+    main_pipe_angle = -math.radians(main_pipe_angle)
+    rot_pipe_angle = -math.radians(rot_pipe_angle)
 
 
 
