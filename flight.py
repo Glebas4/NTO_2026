@@ -56,7 +56,7 @@ def image_callback(data):
         x, y = 0, 0
 
     error = (160 - x) * kP
-    set_yaw_rate(yaw=math.radians(error))  
+    set_yaw_rate(math.radians(error))  
     set_velocity(vx=0, vy=0.5, vz=0, frame_id='body')  
 
     img = cv.circle(img, (x, y), 5, (0, 0, 255), 1)
