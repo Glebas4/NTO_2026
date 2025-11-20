@@ -44,9 +44,17 @@ def image_callback(data):
 
     contours, _ = cv.findContours(img_morph, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     largest_contour = max(contours, key=cv.contourArea)
-    x, y, w, h = cv.boundingRect(largest_contour)
+    #x, y, w, h = cv.boundingRect(largest_contour)
     
-    img = cv.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    M = cv.moments(img_morph)
+
+    if M["m00"] != 0:
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+    else:
+        cX, cY = 0, 0
+
+    img = cv.circle(img, (cX, cY), 5, (255, 0, 0), -1)
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
