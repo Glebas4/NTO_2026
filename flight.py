@@ -56,8 +56,8 @@ def image_callback(data):
         x, y = 0, 0
 
     error = (160 - x) * kP
-    set_yaw_rate(math.radians(error))  
-    set_velocity(vx=0, vy=0.5, vz=0, frame_id='body')  
+    #set_yaw_rate(math.radians(error))  
+    set_velocity(vx=error, vy=0, vz=0, frame_id='aruco_map')  
 
     img = cv.circle(img, (x, y), 5, (0, 0, 255), 1)
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
@@ -65,7 +65,7 @@ def image_callback(data):
 
 def main():
     navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
-    navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
+    #navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
     navigate_wait(1, 1, 1)
 
 
