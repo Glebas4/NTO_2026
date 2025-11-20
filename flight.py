@@ -42,25 +42,29 @@ def image_callback(data):
     
     img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
 
-    contours, _ = cv.findContours(img_morph, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    largest_contour = max(contours, key=cv.contourArea)
+    #contours, _ = cv.findContours(img_morph, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    #largest_contour = max(contours, key=cv.contourArea)
     #x, y, w, h = cv.boundingRect(largest_contour)
     
     M = cv.moments(img_morph)
 
     if M["m00"] != 0:
-        cX = int(M["m10"] / M["m00"])
-        cY = int(M["m01"] / M["m00"])
+        x = int(M["m10"] / M["m00"])
+        y = int(M["m01"] / M["m00"])
     else:
-        cX, cY = 0, 0
+        x, y = 0, 0
 
-    img = cv.circle(img, (cX, cY), 5, (255, 0, 0), -1)
+    error = (160 - x) // 3.5
+    set_yaw(yaw=math.radians(error), frame_id='body')    
+
+    img = cv.circle(img, (x, y), 5, (255, 0, 0), -1)
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
 def main():
     navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
     navigate_wait(1, 1, 1)
+    set_velocity(vx=0.1, vy=0.0, vz=0, frame_id='body')
 
 
 
