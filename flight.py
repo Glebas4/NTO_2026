@@ -65,6 +65,7 @@ def image_callback(data):
 
 def main():
     navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
+    navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
     navigate_wait(1, 1, 1)
 
 
