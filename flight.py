@@ -13,7 +13,7 @@ rospy.init_node('flight')
 get_telemetry = rospy.ServiceProxy('get_telemetry', srv.GetTelemetry)
 navigate = rospy.ServiceProxy('navigate', srv.Navigate)
 set_altitude = rospy.ServiceProxy('set_altitude', srv.SetAltitude)
-set_yaw_rate = rospy.ServiceProxy('set_yaw_rate', srv.SetYawRate)
+set_yaw = rospy.ServiceProxy('set_yaw_rate', srv.SetYaw)
 set_position = rospy.ServiceProxy('set_position', srv.SetPosition)
 set_velocity = rospy.ServiceProxy('set_velocity', srv.SetVelocity)
 land = rospy.ServiceProxy('land', Trigger)
@@ -40,26 +40,25 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
 def image_callback(data):
     img = bridge.imgmsg_to_cv2(data, 'bgr8') 
     bin = cv.inRange(img, yellow_low, yellow_up)
-    
     img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
-
-    #contours, _ = cv.findContours(img_morph, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    #largest_contour = max(contours, key=cv.contourArea)
-    #x, y, w, h = cv.boundingRect(largest_contour)
     
     M = cv.moments(img_morph)
-
+    
     if M["m00"] != 0:
         x = int(M["m10"] / M["m00"])
         y = int(M["m01"] / M["m00"])
+        
+        dx = x - 160
+        dy = y - 140
+        angle = np.arctan2(dy, dx)
+
+        set_yaw(angle)
+        set_velocity(vx=0.1, vy=0, vz=0, frame_id='body')
+
+        img = cv.circle(img, (x, y), 5, (0, 0, 255), 1)
     else:
         x, y = 0, 0
 
-    error = (160 - x) * kP
-    set_yaw_rate(math.radians(error))  
-    set_velocity(vx=-0.5, vy=0, vz=0, frame_id='body')  
-
-    img = cv.circle(img, (x, y), 5, (0, 0, 255), 1)
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
