@@ -13,7 +13,7 @@ rospy.init_node('flight')
 get_telemetry = rospy.ServiceProxy('get_telemetry', srv.GetTelemetry)
 navigate = rospy.ServiceProxy('navigate', srv.Navigate)
 set_altitude = rospy.ServiceProxy('set_altitude', srv.SetAltitude)
-set_yaw = rospy.ServiceProxy('set_yaw_rate', srv.SetYaw)
+set_yaw = rospy.ServiceProxy('set_yaw', srv.SetYaw)
 set_position = rospy.ServiceProxy('set_position', srv.SetPosition)
 set_velocity = rospy.ServiceProxy('set_velocity', srv.SetVelocity)
 land = rospy.ServiceProxy('land', Trigger)
@@ -49,13 +49,14 @@ def image_callback(data):
         y = int(M["m01"] / M["m00"])
         
         dx = x - 160
-        dy = y - 140
+        dy = 140 - y
         angle = np.arctan2(dy, dx)
 
-        set_yaw(angle)
-        set_velocity(vx=0.1, vy=0, vz=0, frame_id='body')
+        set_yaw(yaw=angle, frame_id='body')
+        #set_velocity(vx=0.1, vy=0, vz=0, frame_id='body')
 
-        img = cv.circle(img, (x, y), 5, (0, 0, 255), 1)
+        img = cv.line(img, (160, 120), (dx, dy), (0, 255, 255), 2)
+        img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
     else:
         x, y = 0, 0
 
@@ -64,7 +65,7 @@ def image_callback(data):
 
 def main():
     navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
-    #navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
+    navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
     navigate_wait(1, 1, 1)
 
 
