@@ -55,7 +55,7 @@ def image_callback(data):
         set_yaw(yaw=angle, frame_id='body')
         set_velocity(vx=0.1, vy=0, vz=0, frame_id='body')
 
-        img = cv.line(img, (160, 120), (dx, dy), (0, 255, 255), 2)
+        img = cv.line(img, (160, 120), (x, y), (0, 255, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
     else:
         x, y = 0, 0
