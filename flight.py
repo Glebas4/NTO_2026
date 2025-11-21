@@ -53,7 +53,7 @@ def image_callback(data):
         angle = math.atan(dy/dx)
 
         set_yaw(yaw=angle, frame_id='body')
-        set_velocity(vx=0.2, vy=0, vz=0, frame_id='body')
+        set_velocity(vx=0.1, vy=0, vz=0, frame_id='body')
 
         img = cv.line(img, (160, 120), (dx, dy), (0, 255, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
@@ -65,6 +65,7 @@ def image_callback(data):
 
 def main():
     navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
+    navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
     navigate_wait(1, 1, 1)
 
 
