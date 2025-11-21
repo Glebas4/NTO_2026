@@ -50,12 +50,14 @@ def image_callback(data):
         
         dx = x - 160
         dy = 120 - y
-        angle = math.atan(dy/dx)
+        angle_rad = np.arctan2(dy, dx)
+        yaw_error = angle_rad - 1.58
+        print(np.degrees(yaw_error))
+        
+        set_yaw(yaw=yaw_error, frame_id='body')
+        set_velocity(vx=0, vy=-0.2, vz=0, frame_id='body')
 
-        set_yaw(yaw=angle, frame_id='body')
-        set_velocity(vx=0.1, vy=0, vz=0, frame_id='body')
-
-        img = cv.line(img, (160, 120), (x, y), (0, 255, 255), 2)
+        img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
     else:
         x, y = 0, 0
