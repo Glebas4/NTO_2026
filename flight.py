@@ -49,11 +49,11 @@ def image_callback(data):
         y = int(M["m01"] / M["m00"])
         
         dx = x - 160
-        dy = 140 - y
-        angle = np.arctan2(dy, dx)
+        dy = 120 - y
+        angle = math.atan(dy/dx)
 
         set_yaw(yaw=angle, frame_id='body')
-        #set_velocity(vx=0.1, vy=0, vz=0, frame_id='body')
+        set_velocity(vx=0, vy=-0.2, vz=0, frame_id='body')
 
         img = cv.line(img, (160, 120), (dx, dy), (0, 255, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
