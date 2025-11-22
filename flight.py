@@ -38,7 +38,7 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
 
 @long_callback
 def image_callback(data):
-    img = bridge.imgmsg_to_cv2(data, 'bgr8') 
+    img = bridge.imgmsg_to_cv2(data, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
     img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
     
@@ -52,7 +52,6 @@ def image_callback(data):
         dy = 120 - y
         angle_rad = np.arctan2(dy, dx)
         yaw_error = angle_rad - 1.58
-        print(np.degrees(yaw_error))
         
         set_yaw(yaw=yaw_error, frame_id='body')
         set_velocity(vx=0, vy=-0.2, vz=0, frame_id='body')
