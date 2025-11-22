@@ -12,7 +12,6 @@ rospy.init_node('flight')
 
 get_telemetry = rospy.ServiceProxy('get_telemetry', srv.GetTelemetry)
 navigate = rospy.ServiceProxy('navigate', srv.Navigate)
-set_altitude = rospy.ServiceProxy('set_altitude', srv.SetAltitude)
 set_yaw = rospy.ServiceProxy('set_yaw', srv.SetYaw)
 set_position = rospy.ServiceProxy('set_position', srv.SetPosition)
 set_velocity = rospy.ServiceProxy('set_velocity', srv.SetVelocity)
@@ -54,7 +53,7 @@ def image_callback(data):
         yaw_error = angle_rad - 1.58
         
         set_yaw(yaw=yaw_error, frame_id='body')
-        set_velocity(vx=0, vy=-0.2, vz=0, frame_id='body')
+        set_velocity(vx=0.2, vy=0, vz=0, frame_id='body')
 
         img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
