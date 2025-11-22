@@ -13,6 +13,7 @@ rospy.init_node('flight')
 get_telemetry = rospy.ServiceProxy('get_telemetry', srv.GetTelemetry)
 navigate = rospy.ServiceProxy('navigate', srv.Navigate)
 set_yaw = rospy.ServiceProxy('set_yaw', srv.SetYaw)
+set_altitude = rospy.ServiceProxy('set_altitude', srv.SetAltitude)
 set_position = rospy.ServiceProxy('set_position', srv.SetPosition)
 set_velocity = rospy.ServiceProxy('set_velocity', srv.SetVelocity)
 land = rospy.ServiceProxy('land', Trigger)
@@ -67,6 +68,7 @@ def main():
     navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
     navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
     navigate_wait(1, 1, 1)
+    set_altitude(z=1, frame_id='terrain')
 
 
 
