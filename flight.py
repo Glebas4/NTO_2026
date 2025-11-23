@@ -13,6 +13,7 @@ import math                                       # type: ignore
 import numpy as np                                # type: ignore
 
 
+
 rospy.init_node('flight')
 get_telemetry = rospy.ServiceProxy('get_telemetry', srv.GetTelemetry)
 navigate = rospy.ServiceProxy('navigate', srv.Navigate)
@@ -34,6 +35,7 @@ yellow_up = (86, 228, 228)
 kernel_size = (5, 5) 
 kernel = cv.getStructuringElement(cv.MORPH_RECT, kernel_size)
 vrezki = []
+
 
 
 def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
@@ -95,9 +97,9 @@ def image_callback(msg):
         area = w*h
         if area > 400:
             vrezka = get_cords((x, y), 1, msg) 
-            point = np.array([vrezka.x, vrezka.y])
+            point = np.array([vrezka.point.x, vrezka.point.y])
             if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
-                print(f"Vrezka at x={round(vrezka.x, 2)}; y={round(vrezka.y, 2)}")
+                print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
                 vrezki.append(point)
             img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
