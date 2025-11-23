@@ -55,7 +55,7 @@ def find_vrezki(cnts):
     return vrezki
 
 
-def follow_line(img_morph):
+def follow_line(img_morph, img):
     M = cv.moments(img_morph) #line following
     
     if M["m00"] != 0:
@@ -70,13 +70,10 @@ def follow_line(img_morph):
         set_yaw(yaw=yaw_error, frame_id='body')
         set_velocity(vx=0.2, vy=0, vz=0, frame_id='body')
 
-        img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
-        img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
-
-        return img
     else:
         x, y = 0, 0
-        return 0
+    
+    return x, y
 
 
 @long_callback
@@ -86,11 +83,12 @@ def image_callback(data):
     img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
     contours, _ = cv.findContours(bin, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
-    img_new = follow_line(img_morph)
+    x, y = follow_line(img_morph)
     vrezki = find_vrezki(contours)
 
-    if img_new:
-        img = img_new
+    if x and y:
+        img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
+        img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
 
     for point in vrezki():
         img = cv.circle(img, (point[0], point[1]), 5, (0, 0, 255), -1)
