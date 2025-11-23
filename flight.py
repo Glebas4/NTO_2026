@@ -95,7 +95,7 @@ def image_callback(msg):
     for c in contours:
         x, y, w, h = cv.boundingRect(c)
         area = w*h
-        if area > 450:
+        if area > 400:
             vrezka = get_cords((x, y), 1, msg) 
             point = np.array([vrezka.point.x, vrezka.point.y])
             if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
