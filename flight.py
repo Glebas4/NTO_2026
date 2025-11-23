@@ -37,6 +37,7 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
 
 def find_vrezki(cnts):
     vrezki = []
+    vrezki_cords = []
     areas = []
     for c in cnts:
         x, y, w, h = cv.boundingRect(c)
@@ -50,9 +51,9 @@ def find_vrezki(cnts):
     for (x, y, w, h) in vrezki:
         cx = x + w/2
         cy = y + h/2
-        vrezki.append((cx, cy))
+        vrezki_cords.append((cx, cy))
 
-    return vrezki
+    return vrezki_cords
 
 
 def follow_line(img_morph):
@@ -92,14 +93,16 @@ def image_callback(data):
 
     if vrezki:
         for point in vrezki:
-            img = cv.circle(img, (point[0], point[1]), 5, (0, 0, 255), -1)
+            x = int(point[0])
+            y = int(point[1])
+            img = cv.circle(img, x, y, 5, (0, 0, 255), -1)
     
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
 def main():
     navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
-    navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
+    #navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
     navigate_wait(1, 1, 1)
     set_altitude(z=1, frame_id='terrain')
 
