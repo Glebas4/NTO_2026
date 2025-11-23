@@ -73,6 +73,7 @@ def image_callback(data):
     img_morph__inv = cv.bitwise_not(img_morph)
 
     vrezki_mask = cv.bitwise_and(img_morph__inv, bin)
+    vrezki_morph = cv.morphologyEx(vrezki_mask, cv.MORPH_OPEN, kernel, iterations=1)
     contours, _ = cv.findContours(vrezki_mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
     for c in contours:
@@ -82,8 +83,8 @@ def image_callback(data):
         areas.append(area)
         img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
-    idx_big = np.argmax(areas)
-    vrezki = [vrezki[i] for i in range(len(vrezki)) if i != idx_big]
+    #idx_big = np.argmax(areas)
+    #vrezki = [vrezki[i] for i in range(len(vrezki)) if i != idx_big]
 
     #for (x, y, w, h) in vrezki:
         #img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
