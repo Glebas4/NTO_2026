@@ -68,8 +68,12 @@ def image_callback(data):
     areas = []
     img = bridge.imgmsg_to_cv2(data, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
+
     img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
-    contours, _ = cv.findContours(bin, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    img_morph__inv = cv.bitwise_not(img_morph)
+
+    vrezki_mask = cv.bitwise_and(img_morph__inv, bin)
+    contours, _ = cv.findContours(vrezki_mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
     for c in contours:
         x, y, w, h = cv.boundingRect(c)
