@@ -65,7 +65,6 @@ def follow_line(img_morph):
 @long_callback
 def image_callback(data):
     vrezki = []
-    vrezki_cords = []
     areas = []
     img = bridge.imgmsg_to_cv2(data, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
@@ -77,12 +76,13 @@ def image_callback(data):
         area = w*h
         vrezki.append((x, y, w, h))
         areas.append(area)
+        img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
     idx_big = np.argmax(areas)
     vrezki = [vrezki[i] for i in range(len(vrezki)) if i != idx_big]
 
-    for (x, y, w, h) in vrezki:
-        img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+    #for (x, y, w, h) in vrezki:
+        #img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
     x, y = follow_line(img_morph)
     #vrezki = find_vrezki(contours)
