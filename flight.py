@@ -41,7 +41,7 @@ def image_callback(data):
     img = bridge.imgmsg_to_cv2(data, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
     img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
-    _, contours, hierarchy = cv.findContours(img_morph, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv.findContours(img_morph, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
     M = cv.moments(img_morph)
     
@@ -59,7 +59,7 @@ def image_callback(data):
 
         img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
-        img = cv.drawContours(img, contours, -1, (0, 255, 0), 3, cv.LINE_AA, hierarchy, 1)
+        img = cv.drawContours(img, contours, -1, (0, 255, 0), 2, cv.LINE_AA)
     else:
         x, y = 0, 0
 
