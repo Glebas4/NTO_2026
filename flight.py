@@ -35,12 +35,6 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
         rospy.sleep(0.2)
 
 
-#def find_vrezki(cnts):
-    
-
-    #return vrezki_cords
-
-
 def follow_line(img_morph):
     M = cv.moments(img_morph) #line following
     
@@ -81,17 +75,13 @@ def image_callback(data):
         area = w*h
         vrezki.append((x, y, w, h))
         areas.append(area)
-        img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-    #idx_big = np.argmax(areas)
-    #vrezki = [vrezki[i] for i in range(len(vrezki)) if i != idx_big]
-
-    #for (x, y, w, h) in vrezki:
-        #img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        if area > 100:
+            img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        if abs(y+h/2 - 120) < 10:
+            telem = get_telemetry(frame_id='aruco_map') 
+            print(f"Vrezka at x={telem.x}; y={telem.y}") 
 
     x, y = follow_line(img_morph)
-    #vrezki = find_vrezki(contours)
-
     if x and y:
         img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
