@@ -35,25 +35,10 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
         rospy.sleep(0.2)
 
 
-def find_vrezki(cnts):
-    vrezki = []
-    vrezki_cords = []
-    areas = []
-    for c in cnts:
-        x, y, w, h = cv.boundingRect(c)
-        area = w*h
-        vrezki.append((x, y, w, h))
-        areas.append(area)
+#def find_vrezki(cnts):
+    
 
-    idx_big = np.argmax(areas)
-    vrezki = [vrezki[i] for i in range(len(vrezki)) if i != idx_big]
-
-    for (x, y, w, h) in vrezki:
-        cx = x + w/2
-        cy = y + h/2
-        vrezki_cords.append((cx, cy))
-
-    return vrezki_cords
+    #return vrezki_cords
 
 
 def follow_line(img_morph):
@@ -79,23 +64,34 @@ def follow_line(img_morph):
 
 @long_callback
 def image_callback(data):
+    vrezki = []
+    vrezki_cords = []
+    areas = []
     img = bridge.imgmsg_to_cv2(data, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
     img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
     contours, _ = cv.findContours(bin, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
+    for c in contours:
+        x, y, w, h = cv.boundingRect(c)
+        area = w*h
+        vrezki.append((x, y, w, h))
+        areas.append(area)
+
+    idx_big = np.argmax(areas)
+    vrezki = [vrezki[i] for i in range(len(vrezki)) if i != idx_big]
+
+    for (x, y, w, h) in vrezki:
+        cx = x + w/2
+        cy = y + h/2
+        img = cv.circle(img, cx, cy, 5, (0, 0, 255), -1)
+
     x, y = follow_line(img_morph)
-    vrezki = find_vrezki(contours)
+    #vrezki = find_vrezki(contours)
 
     if x and y:
         img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
-
-    if vrezki:
-        for point in vrezki:
-            x = int(point[0])
-            y = int(point[1])
-            img = cv.circle(img, x, y, 5, (0, 0, 255), -1)
     
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
