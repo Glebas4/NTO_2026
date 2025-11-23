@@ -82,9 +82,7 @@ def image_callback(data):
     vrezki = [vrezki[i] for i in range(len(vrezki)) if i != idx_big]
 
     for (x, y, w, h) in vrezki:
-        cx = x + w/2
-        cy = y + h/2
-        img = cv.circle(img, cx, cy, 5, (0, 0, 255), -1)
+        img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
     x, y = follow_line(img_morph)
     #vrezki = find_vrezki(contours)
