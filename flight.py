@@ -91,7 +91,7 @@ def image_callback(data):
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
 
     if vrezki:
-        for point in vrezki():
+        for point in vrezki:
             img = cv.circle(img, (point[0], point[1]), 5, (0, 0, 255), -1)
     
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
