@@ -48,7 +48,7 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
         rospy.sleep(0.2)
 
 
-def get_cords(xy, z, msg):
+def get_cords(xy, z, msg): # Image msg, xy point from cam
     xy_rect = camera_model.rectifyPoint(xy)
     ray = camera_model.projectPixelTo3dRay(xy_rect)
     pnt = Point(x=ray[0] * z, y=ray[1] * z, z=z)
@@ -95,7 +95,7 @@ def image_callback(msg):
     for c in contours:
         x, y, w, h = cv.boundingRect(c)
         area = w*h
-        if area > 400:
+        if area > 450:
             vrezka = get_cords((x, y), 1, msg) 
             point = np.array([vrezka.point.x, vrezka.point.y])
             if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
@@ -116,7 +116,7 @@ def image_callback(msg):
 def main():
     navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
     #navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
-    navigate_wait(0.5, 0.5, 1)
+    navigate_wait(0.5, 0.8, 1)
 
 
 
