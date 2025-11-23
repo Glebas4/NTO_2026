@@ -24,7 +24,6 @@ yellow_low = (78, 220, 220)
 yellow_up = (86, 228, 228)
 kernel_size = (5, 5) 
 kernel = cv.getStructuringElement(cv.MORPH_RECT, kernel_size)
-kP = 0.05
 
 def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
     navigate(x=x, y=y, z=z, yaw=yaw, speed=speed, frame_id=frame_id, auto_arm=auto_arm)
@@ -36,14 +35,28 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
         rospy.sleep(0.2)
 
 
-@long_callback
-def image_callback(data):
-    img = bridge.imgmsg_to_cv2(data, 'bgr8') [0:120, 0:320]
-    bin = cv.inRange(img, yellow_low, yellow_up)
-    img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
-    contours, _ = cv.findContours(img_morph, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+def find_vrezki(cnts):
+    vrezki = []
+    areas = []
+    for c in cnts:
+        x, y, w, h = cv.boundingRect(c)
+        area = w*h
+        vrezki.append((x, y, w, h))
+        areas.append(area)
 
-    M = cv.moments(img_morph)
+    idx_big = np.argmax(areas)
+    vrezki = [vrezki[i] for i in range(len(vrezki)) if i != idx_big]
+
+    for (x, y, w, h) in vrezki:
+        cx = x + w/2
+        cy = y + h/2
+        vrezki.append((cx, cy))
+
+    return vrezki
+
+
+def follow_line(img_morph):
+    M = cv.moments(img_morph) #line following
     
     if M["m00"] != 0:
         x = int(M["m10"] / M["m00"])
@@ -59,10 +72,29 @@ def image_callback(data):
 
         img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
-        img = cv.drawContours(img, contours, -1, (0, 255, 0), 2, cv.LINE_AA)
+
+        return img
     else:
         x, y = 0, 0
+        return 0
 
+
+@long_callback
+def image_callback(data):
+    img = bridge.imgmsg_to_cv2(data, 'bgr8') [0:120, 0:320]
+    bin = cv.inRange(img, yellow_low, yellow_up)
+    img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
+    contours, _ = cv.findContours(bin, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+
+    img_new = follow_line(img_morph)
+    vrezki = find_vrezki(contours)
+
+    if img_new:
+        img = img_new
+
+    for point in vrezki():
+        img = cv.circle(img, (point[0], point[1]), 5, (0, 0, 255), -1)
+    
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
