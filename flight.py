@@ -94,8 +94,8 @@ def image_callback(msg):
     for c in contours:
         x, y, w, h = cv.boundingRect(c)
         area = w*h
-        if area > 300:
-            print(get_cords(x, y, msg))
+        if area > 400:
+            print(get_cords((x, y), 1, msg))
             img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
 
