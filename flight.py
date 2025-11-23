@@ -1,15 +1,20 @@
-import rospy
-from clover import srv
-from std_srvs.srv import Trigger
-from clover import long_callback
-import cv2 as cv
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
-import math
-import numpy as np
+import rospy                                      # type: ignore
+from clover import srv                            # type: ignore
+from std_srvs.srv import Trigger                  # type: ignore
+from clover import long_callback                  # type: ignore
+import cv2 as cv                                  # type: ignore 
+from sensor_msgs.msg import Image, CameraInfo     # type: ignore
+from cv_bridge import CvBridge                    # type: ignore
+from geometry_msgs.msg import PointStamped, Point # type: ignore
+import tf2_ros                                    # type: ignore
+import tf2_geometry_msgs                          # type: ignore
+import image_geometry                             # type: ignore
+import math                                       # type: ignore
+import numpy as np                                # type: ignore
+
+
 
 rospy.init_node('flight')
-
 get_telemetry = rospy.ServiceProxy('get_telemetry', srv.GetTelemetry)
 navigate = rospy.ServiceProxy('navigate', srv.Navigate)
 set_yaw = rospy.ServiceProxy('set_yaw', srv.SetYaw)
@@ -17,13 +22,20 @@ set_altitude = rospy.ServiceProxy('set_altitude', srv.SetAltitude)
 set_position = rospy.ServiceProxy('set_position', srv.SetPosition)
 set_velocity = rospy.ServiceProxy('set_velocity', srv.SetVelocity)
 land = rospy.ServiceProxy('land', Trigger)
+
 bridge = CvBridge()
 image_pub = rospy.Publisher('binary', Image, queue_size=1)
+tf_buffer = tf2_ros.Buffer()
+tf_listener = tf2_ros.TransformListener(tf_buffer)
+camera_model = image_geometry.PinholeCameraModel()
+camera_model.fromCameraInfo(rospy.wait_for_message('main_camera/camera_info', CameraInfo))
 
 yellow_low = (78, 220, 220)
 yellow_up = (86, 228, 228)
 kernel_size = (5, 5) 
 kernel = cv.getStructuringElement(cv.MORPH_RECT, kernel_size)
+
+
 
 def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
     navigate(x=x, y=y, z=z, yaw=yaw, speed=speed, frame_id=frame_id, auto_arm=auto_arm)
@@ -33,6 +45,16 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
         if math.sqrt(telem.x ** 2 + telem.y ** 2 + telem.z ** 2) < tolerance:
             break
         rospy.sleep(0.2)
+
+
+def get_cords(xy, z, msg):
+    xy_rect = camera_model.rectifyPoint(xy)
+    ray = camera_model.projectPixelTo3dRay(xy_rect)
+    pnt = Point(x=ray[0] * z, y=ray[1] * z, z=z)
+    target = PointStamped(header=msg.header, point=pnt)
+    pnt_aruco = tf_buffer.transform(target, 'aruco_map', timeout=rospy.Duration(0.2))
+    return pnt_aruco
+
 
 
 def follow_line(img_morph):
@@ -49,6 +71,7 @@ def follow_line(img_morph):
         
         set_yaw(yaw=yaw_error, frame_id='body')
         set_velocity(vx=0.2, vy=0, vz=0, frame_id='body')
+        set_altitude(z=1, frame_id='terrain')
 
     else:
         x, y = 0, 0
@@ -57,10 +80,8 @@ def follow_line(img_morph):
 
 
 @long_callback
-def image_callback(data):
-    vrezki = []
-    areas = []
-    img = bridge.imgmsg_to_cv2(data, 'bgr8') [0:120, 0:320]
+def image_callback(msg):
+    img = bridge.imgmsg_to_cv2(msg, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
 
     img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
@@ -68,20 +89,18 @@ def image_callback(data):
 
     vrezki_mask = cv.bitwise_and(img_morph_inv, bin)
     vrezki_morph = cv.morphologyEx(vrezki_mask, cv.MORPH_OPEN, kernel, iterations=2)
-    contours, _ = cv.findContours(vrezki_mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    contours, _ = cv.findContours(vrezki_morph, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
     for c in contours:
         x, y, w, h = cv.boundingRect(c)
         area = w*h
-        vrezki.append((x, y, w, h))
-        areas.append(area)
-        if area > 100:
+        if area > 300:
+            print(get_cords(x, y, msg))
             img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        if abs(y+h/2 - 120) < 10:
-            telem = get_telemetry(frame_id='aruco_map') 
-            print(f"Vrezka at x={telem.x}; y={telem.y}") 
+
 
     x, y = follow_line(img_morph)
+
     if x and y:
         img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
         img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
@@ -93,7 +112,6 @@ def main():
     navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
     #navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
     navigate_wait(0.5, 0.5, 1)
-    set_altitude(z=1, frame_id='terrain')
 
 
 
