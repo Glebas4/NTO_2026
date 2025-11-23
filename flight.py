@@ -55,7 +55,7 @@ def find_vrezki(cnts):
     return vrezki
 
 
-def follow_line(img_morph, img):
+def follow_line(img_morph):
     M = cv.moments(img_morph) #line following
     
     if M["m00"] != 0:
