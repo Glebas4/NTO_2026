@@ -32,8 +32,6 @@ camera_model.fromCameraInfo(rospy.wait_for_message('main_camera/camera_info', Ca
 
 yellow_low = (78, 220, 220)
 yellow_up = (86, 228, 228)
-kernel_size = (5, 5) 
-kernel = cv.getStructuringElement(cv.MORPH_RECT, kernel_size)
 vrezki = []
 
 
