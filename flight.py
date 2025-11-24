@@ -86,12 +86,12 @@ def image_callback(msg):
     bin = cv.inRange(img, yellow_low, yellow_up)
 
     if cv.countNonZero(bin) > 10:
-        img_eroded = cv.erode(bin, kernel, iterations=1)
+        img_eroded = cv.erode(bin, kernel, iterations=3)
         contours, _ = cv.findContours(img_eroded, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         largest_contour = max(contours, key=cv.contourArea)
         line_mask = np.zeros_like(bin)
         cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
-        line_mask = cv.dilate(line_mask, kernel, iterations=1)
+        line_mask = cv.dilate(line_mask, kernel, iterations=3)
         line_mask_inv = cv.bitwise_not(line_mask)
 
 
