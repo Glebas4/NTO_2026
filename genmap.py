@@ -79,7 +79,7 @@ def gen_pipes(l): #l - длина трубы
     #Чтобы угол меж основной трубой и врезкой был <= 30,то диапазон угла между ними будет равен разнице смещения и 30 градусов
     global rot_pipe_angle, main_pipe_angle, main_pipe_end_x, main_pipe_end_y, rot_pipe_end_x, rot_pipe_end_y
     main_pipe_angle = random.randint(0, 20)
-    rot_pipe_angle = random.randint(main_pipe_angle-20, main_pipe_angle-5) 
+    rot_pipe_angle = random.randint(main_pipe_angle-30, main_pipe_angle-5) 
     rad = math.radians(main_pipe_angle)
     main_pipe_end_x = l * math.sin(rad) + 1  #Смещение второй точки по X и Y 
     main_pipe_end_y = l * math.cos(rad) + 1
