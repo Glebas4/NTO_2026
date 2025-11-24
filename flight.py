@@ -58,8 +58,8 @@ def get_cords(xy, z, msg): # Image msg, xy point from cam
 
 
 
-def follow_line(img_morph):
-    M = cv.moments(img_morph) #line following
+def follow_line(bin):
+    M = cv.moments(bin) #line following
     
     if M["m00"] != 0:
         x = int(M["m10"] / M["m00"])
@@ -90,6 +90,7 @@ def image_callback(msg):
         contours, _ = cv.findContours(img_eroded, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         largest_contour = max(contours, key=cv.contourArea)
         line_mask = np.zeros_like(bin)
+        cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
         line_mask = cv.dilate(line_mask, kernel, iterations=1)
         contours, _ = cv.findContours(line_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         img = cv.drawContours(img, [contours], -1, 255, -1)
