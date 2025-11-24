@@ -72,7 +72,7 @@ def follow_line(bin):
         
         set_yaw(yaw=yaw_error, frame_id='body')
         set_velocity(vx=0.2, vy=0, vz=0, frame_id='body')
-        set_altitude(z=1, frame_id='terrain')
+        set_altitude(z=1.5, frame_id='terrain')
 
     else:
         x, y = 0, 0
@@ -88,42 +88,43 @@ def image_callback(msg):
     if cv.countNonZero(bin) > 10:
         img_eroded = cv.erode(bin, kernel, iterations=3)
         contours, _ = cv.findContours(img_eroded, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-        largest_contour = max(contours, key=cv.contourArea)
-        line_mask = np.zeros_like(bin)
-        cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
-        line_mask = cv.dilate(line_mask, kernel, iterations=3)
-        line_mask_inv = cv.bitwise_not(line_mask)
+        if contours:
+            largest_contour = max(contours, key=cv.contourArea)
+            line_mask = np.zeros_like(bin)
+            cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
+            line_mask = cv.dilate(line_mask, kernel, iterations=3)
+            line_mask_inv = cv.bitwise_not(line_mask)
 
 
-        vrezki_mask = cv.bitwise_and(line_mask_inv, bin)
-        vrezki_morph = cv.morphologyEx(vrezki_mask, cv.MORPH_OPEN, kernel, iterations=2)
-        contours, _ = cv.findContours(vrezki_morph, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+            vrezki_mask = cv.bitwise_and(line_mask_inv, bin)
+            vrezki_morph = cv.morphologyEx(vrezki_mask, cv.MORPH_OPEN, kernel, iterations=2)
+            contours, _ = cv.findContours(vrezki_morph, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
-        for c in contours:
-            x, y, w, h = cv.boundingRect(c)
-            area = w*h
-            if area > 400:
-                vrezka = get_cords((x, y), 1, msg) 
-                point = np.array([vrezka.point.x, vrezka.point.y])
-                if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
-                    print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
-                    vrezki.append(point)
-                img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            for c in contours:
+                x, y, w, h = cv.boundingRect(c)
+                area = w*h
+                if area > 400:
+                    vrezka = get_cords((x, y), 1.5, msg) 
+                    point = np.array([vrezka.point.x, vrezka.point.y])
+                    if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
+                        print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
+                        vrezki.append(point)
+                    img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
 
-        x, y = follow_line(line_mask)
+            x, y = follow_line(line_mask)
 
-        if x and y:
-            img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
-            img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
+            if x and y:
+                img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
+                img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
     
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
 def main():
-    navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
+    navigate_wait(0, 0, 1.5, frame_id="body", auto_arm=True)
     navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
-    navigate_wait(0.5, 0.8, 1)
+    navigate_wait(0.5, 0.8, 1.5)
 
 
 
