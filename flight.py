@@ -90,8 +90,9 @@ def image_callback(msg):
         contours, _ = cv.findContours(img_eroded, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         largest_contour = max(contours, key=cv.contourArea)
         line_mask = np.zeros_like(bin)
-        img = cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
         line_mask = cv.dilate(line_mask, kernel, iterations=1)
+        contours, _ = cv.findContours(line_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+        img = cv.drawContours(img, [contours], -1, 255, -1)
 
 
         #vrezki_mask = cv.bitwise_and(img_morph_inv, bin)
