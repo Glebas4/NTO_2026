@@ -92,24 +92,23 @@ def image_callback(msg):
         line_mask = np.zeros_like(bin)
         cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
         line_mask = cv.dilate(line_mask, kernel, iterations=1)
-        contours, _ = cv.findContours(line_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-        img = cv.drawContours(img, [contours], -1, 255, -1)
+        line_mask_inv = cv.bitwise_not(line_mask)
 
 
-        #vrezki_mask = cv.bitwise_and(img_morph_inv, bin)
-        #vrezki_morph = cv.morphologyEx(vrezki_mask, cv.MORPH_OPEN, kernel, iterations=2)
-        #contours, _ = cv.findContours(vrezki_morph, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+        vrezki_mask = cv.bitwise_and(line_mask_inv, bin)
+        vrezki_morph = cv.morphologyEx(vrezki_mask, cv.MORPH_OPEN, kernel, iterations=2)
+        contours, _ = cv.findContours(vrezki_morph, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
-        #for c in contours:
-            #x, y, w, h = cv.boundingRect(c)
-            #area = w*h
-            #if area > 400:
-                #vrezka = get_cords((x, y), 1, msg) 
-                #point = np.array([vrezka.point.x, vrezka.point.y])
-                #if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
-                    #print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
-                    #vrezki.append(point)
-                #img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        for c in contours:
+            x, y, w, h = cv.boundingRect(c)
+            area = w*h
+            if area > 400:
+                vrezka = get_cords((x, y), 1, msg) 
+                point = np.array([vrezka.point.x, vrezka.point.y])
+                if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
+                    print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
+                    vrezki.append(point)
+                img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
 
         x, y = follow_line(line_mask)
