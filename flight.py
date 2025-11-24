@@ -85,26 +85,25 @@ def image_callback(msg):
     img = bridge.imgmsg_to_cv2(msg, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
 
-    img_morph = cv.morphologyEx(bin, cv.MORPH_OPEN, kernel, iterations=3)
-    img_morph_inv = cv.bitwise_not(img_morph)
+    skeleton = cv.ximgproc.thinning(bin)
+    skeleton_inv = cv.bitwise_not(skeleton)
 
-    vrezki_mask = cv.bitwise_and(img_morph_inv, bin)
-    vrezki_morph = cv.morphologyEx(vrezki_mask, cv.MORPH_OPEN, kernel, iterations=2)
-    contours, _ = cv.findContours(vrezki_morph, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    vrezki_mask = cv.bitwise_and(skeleton_inv, bin)
+    contours, _ = cv.findContours(vrezki_mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
     for c in contours:
         x, y, w, h = cv.boundingRect(c)
         area = w*h
-        if area > 400:
-            vrezka = get_cords((x, y), 1, msg) 
-            point = np.array([vrezka.point.x, vrezka.point.y])
-            if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
-                print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
-                vrezki.append(point)
-            img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        #if area > 400:
+        vrezka = get_cords((x, y), 1, msg) 
+        point = np.array([vrezka.point.x, vrezka.point.y])
+        if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
+            print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
+            vrezki.append(point)
+        img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
 
-    x, y = follow_line(img_morph)
+    x, y = follow_line(skeleton)
 
     if x and y:
         img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
