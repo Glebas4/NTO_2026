@@ -93,6 +93,8 @@ def image_callback(msg):
             line_mask = np.zeros_like(bin)
             cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
             line_mask = cv.dilate(line_mask, kernel, iterations=3)
+            contours, _ = cv.findContours(line_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+            img = cv.drawContours(img, [contours], -1, 255, -1)
             line_mask_inv = cv.bitwise_not(line_mask)
 
 
