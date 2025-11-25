@@ -1,18 +1,16 @@
-import rospy                                      # type: ignore
-from clover import srv                            # type: ignore
-from std_srvs.srv import Trigger                  # type: ignore
-from clover import long_callback                  # type: ignore
-import cv2 as cv                                  # type: ignore 
-from sensor_msgs.msg import Image, CameraInfo     # type: ignore
-from std_msgs.msg import Float32MultiArray        # type: ignore
-from cv_bridge import CvBridge                    # type: ignore
-from geometry_msgs.msg import PointStamped, Point # type: ignore
-import tf2_ros                                    # type: ignore
-import tf2_geometry_msgs                          # type: ignore
-import image_geometry                             # type: ignore
-import math                                       # type: ignore
-import numpy as np                                # type: ignore
-
+import rospy                                                 # type: ignore
+from clover import srv                                       # type: ignore
+from std_srvs.srv import Trigger                             # type: ignore
+from clover import long_callback                             # type: ignore
+import cv2 as cv                                             # type: ignore 
+from sensor_msgs.msg import Image, CameraInfo                # type: ignore
+from cv_bridge import CvBridge                               # type: ignore
+from geometry_msgs.msg import PointStamped, Point, PoseArray, Pose # type: ignore
+import tf2_ros                                               # type: ignore
+import tf2_geometry_msgs                                     # type: ignore
+import image_geometry                                        # type: ignore
+import math                                                  # type: ignore
+import numpy as np                                           # type: ignore
 
 
 rospy.init_node('flight')
@@ -25,7 +23,11 @@ set_velocity = rospy.ServiceProxy('set_velocity', srv.SetVelocity)
 land = rospy.ServiceProxy('land', Trigger)
 
 image_pub = rospy.Publisher('result', Image, queue_size=1)
-cords_pub = rospy.Publisher('pipes_cords', Float32MultiArray, queue_size=1)
+
+points_pub = rospy.Publisher("pipes", PoseArray, queue_size=10)
+msg = PoseArray()
+msg.header.stamp = rospy.Time.now()
+msg.header.frame_id = "aruco_map"
 
 bridge = CvBridge()
 tf_buffer = tf2_ros.Buffer()
@@ -84,6 +86,7 @@ def follow_line(bin):
 
 @long_callback
 def image_callback(msg):
+    global vrezki
     img = bridge.imgmsg_to_cv2(msg, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
 
@@ -122,15 +125,20 @@ def image_callback(msg):
                 img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
                 img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
 
+    data_pub()
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
 def data_pub():
-    rate = rospy.Rate(1)
-    msg = Float32MultiArray()
-    msg.data = vrezki.tolist()
-    cords_pub.publish(msg)
-    rate.sleep()
+    for pnt in vrezki:
+        x = pnt[0]
+        y = pnt[1]
+        pnt = Pose()
+        pnt.position.x = x
+        pnt.position.y = y
+        pnt.position.z = 0
+        msg.poses.append(pnt)
+    points_pub.publish(msg)
 
 
 def main():
