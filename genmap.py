@@ -111,7 +111,7 @@ def main():
         ps4.delete()
         ps5.delete()
     else:
-        gen_pipes(l=3)
+        gen_pipes(l=3.4)
         main_pipe_vrezki = gen_points(x1=main_pipe_start_x, x2=main_pipe_end_x, y1=main_pipe_start_y, y2=main_pipe_end_y, n=3)
         rot_pipe_vrezki  = gen_points(x1=main_pipe_end_x, x2=rot_pipe_end_x, y1=main_pipe_end_y, y2=rot_pipe_end_y, n=2)
 
