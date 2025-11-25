@@ -124,7 +124,7 @@ def image_callback(msg):
 def main():
     navigate_wait(0, 0, 1.2, frame_id="body", auto_arm=True)
     navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
-    navigate_wait(0.5, 0.8, 1.2)
+    navigate_wait(0.5, 0.5, 1.2)
     set_altitude(z=1.2, frame_id='terrain')
 
 
