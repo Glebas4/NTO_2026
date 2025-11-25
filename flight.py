@@ -24,7 +24,7 @@ land = rospy.ServiceProxy('land', Trigger)
 
 image_pub = rospy.Publisher('result', Image, queue_size=1)
 
-points_pub = rospy.Publisher("pipes", PoseArray, queue_size=10)
+points_pub = rospy.Publisher("tubes", PoseArray, queue_size=10)
 msg = PoseArray()
 msg.header.stamp = rospy.Time.now()
 msg.header.frame_id = "aruco_map"
@@ -115,6 +115,7 @@ def image_callback(msg):
                     if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
                         print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
                         vrezki.append(point)
+                        data_pub(point)
             
                     img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
@@ -125,25 +126,23 @@ def image_callback(msg):
                 img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
                 img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
 
-    data_pub()
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
-def data_pub():
-    for pnt in vrezki:
-        x = pnt[0]
-        y = pnt[1]
-        pnt = Pose()
-        pnt.position.x = x
-        pnt.position.y = y
-        pnt.position.z = 0
-        msg.poses.append(pnt)
+def data_pub(pnt):
+    x = pnt[0]
+    y = pnt[1]
+    pnt = Pose()
+    pnt.position.x = x
+    pnt.position.y = y
+    pnt.position.z = 0
+    msg.poses.append(pnt)
     points_pub.publish(msg)
 
 
 def main():
     navigate_wait(0, 0, 1.2, frame_id="body", auto_arm=True)
-    navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
+    navigate_wait(0, 0, 1.2, math.radians(90))
     navigate_wait(0.5, 0.5, 1.2)
     set_altitude(z=1.2, frame_id='terrain')
 
@@ -151,6 +150,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-    data_pub()
     image_sub = rospy.Subscriber('main_camera/image_raw', Image, image_callback)
     rospy.spin()
