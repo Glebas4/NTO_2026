@@ -32,7 +32,7 @@ camera_model.fromCameraInfo(rospy.wait_for_message('main_camera/camera_info', Ca
 
 yellow_low = (78, 220, 220)
 yellow_up = (86, 228, 228)
-kernel_size = (5, 5) 
+kernel_size = (6, 6) 
 kernel = cv.getStructuringElement(cv.MORPH_RECT, kernel_size)
 vrezki = []
 
@@ -71,8 +71,9 @@ def follow_line(bin):
         yaw_error = angle_rad - 1.58
         
         set_yaw(yaw=yaw_error, frame_id='body')
-        set_velocity(vx=0.2, vy=0, vz=0, frame_id='body')
+        #set_velocity(vx=0.2, vy=0, vz=0, frame_id='body')
         set_altitude(z=1, frame_id='terrain')
+        navigate(0, 0.1, 0, frame_id="body")
 
     else:
         x, y = 0, 0
@@ -86,13 +87,13 @@ def image_callback(msg):
     bin = cv.inRange(img, yellow_low, yellow_up)
 
     if cv.countNonZero(bin) > 10:
-        img_eroded = cv.erode(bin, kernel, iterations=3)
+        img_eroded = cv.erode(bin, kernel, iterations=2)
         contours, _ = cv.findContours(img_eroded, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         if contours:
             largest_contour = max(contours, key=cv.contourArea)
             line_mask = np.zeros_like(bin)
             cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
-            line_mask = cv.dilate(line_mask, kernel, iterations=3)
+            line_mask = cv.dilate(line_mask, kernel, iterations=2)
             contours, _ = cv.findContours(line_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
             img = cv.drawContours(img, [contours], -1, 255, -1)
             line_mask_inv = cv.bitwise_not(line_mask)
@@ -104,8 +105,8 @@ def image_callback(msg):
             for c in contours:
                 x, y, w, h = cv.boundingRect(c)
                 area = w*h
-                if area > 400:
-                    vrezka = get_cords((x, y), 1, msg) 
+                if area > 400 and w > 60:
+                    vrezka = get_cords((x, y), 1.2, msg) 
                     point = np.array([vrezka.point.x, vrezka.point.y])
                     if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
                         print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
