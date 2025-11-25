@@ -71,9 +71,7 @@ def follow_line(bin):
         yaw_error = angle_rad - 1.58
         
         set_yaw(yaw=yaw_error, frame_id='body')
-        #set_velocity(vx=0.2, vy=0, vz=0, frame_id='body')
-        set_altitude(z=1, frame_id='terrain')
-        navigate(0, 0.1, 0, frame_id="body")
+        set_velocity(vx=0.2, vy=0, vz=0, frame_id='body')
 
     else:
         x, y = 0, 0
@@ -95,7 +93,7 @@ def image_callback(msg):
             cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
             line_mask = cv.dilate(line_mask, kernel, iterations=2)
             contours, _ = cv.findContours(line_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-            img = cv.drawContours(img, [contours], -1, 255, -1)
+            img = cv.drawContours(img, contours, -1, 255, -1)
             line_mask_inv = cv.bitwise_not(line_mask)
 
 
@@ -105,7 +103,7 @@ def image_callback(msg):
             for c in contours:
                 x, y, w, h = cv.boundingRect(c)
                 area = w*h
-                if area > 400 and w > 60:
+                if area > 400:
                     vrezka = get_cords((x, y), 1.2, msg) 
                     point = np.array([vrezka.point.x, vrezka.point.y])
                     if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
@@ -124,9 +122,10 @@ def image_callback(msg):
 
 
 def main():
-    navigate_wait(0, 0, 1, frame_id="body", auto_arm=True)
+    navigate_wait(0, 0, 1.2, frame_id="body", auto_arm=True)
     navigate_wait(yaw=math.radians(90), frame_id='aruco_map')
-    navigate_wait(0.5, 0.8, 1)
+    navigate_wait(0.5, 0.8, 1.2)
+    set_altitude(z=1.2, frame_id='terrain')
 
 
 
