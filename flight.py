@@ -4,6 +4,7 @@ from std_srvs.srv import Trigger                  # type: ignore
 from clover import long_callback                  # type: ignore
 import cv2 as cv                                  # type: ignore 
 from sensor_msgs.msg import Image, CameraInfo     # type: ignore
+from std_msgs.msg import Float32MultiArray        # type: ignore
 from cv_bridge import CvBridge                    # type: ignore
 from geometry_msgs.msg import PointStamped, Point # type: ignore
 import tf2_ros                                    # type: ignore
@@ -23,8 +24,10 @@ set_position = rospy.ServiceProxy('set_position', srv.SetPosition)
 set_velocity = rospy.ServiceProxy('set_velocity', srv.SetVelocity)
 land = rospy.ServiceProxy('land', Trigger)
 
+image_pub = rospy.Publisher('result', Image, queue_size=1)
+cords_pub = rospy.Publisher('pipes_cords', Float32MultiArray, queue_size=1)
+
 bridge = CvBridge()
-image_pub = rospy.Publisher('binary', Image, queue_size=1)
 tf_buffer = tf2_ros.Buffer()
 tf_listener = tf2_ros.TransformListener(tf_buffer)
 camera_model = image_geometry.PinholeCameraModel()
@@ -109,16 +112,25 @@ def image_callback(msg):
                     if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
                         print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
                         vrezki.append(point)
+            
                     img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
 
             x, y = follow_line(line_mask)
 
-            if x and y:
+            if x:
                 img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
                 img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
-    
+
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
+
+
+def data_pub():
+    rate = rospy.Rate(1)
+    msg = Float32MultiArray()
+    msg.data = vrezki.tolist()
+    cords_pub.publish(msg)
+    rate.sleep()
 
 
 def main():
@@ -131,5 +143,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+    data_pub()
     image_sub = rospy.Subscriber('main_camera/image_raw', Image, image_callback)
     rospy.spin()
