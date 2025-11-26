@@ -4,7 +4,7 @@ from std_srvs.srv import Trigger                             # type: ignore
 from std_msgs.msg import Int16                               # type: ignore
 from clover import long_callback                             # type: ignore
 import cv2 as cv                                             # type: ignore 
-from sensor_msgs.msg import Image, CameraInfo, Range         # type: ignore
+from sensor_msgs.msg import Image, CameraInfo        # type: ignore
 from cv_bridge import CvBridge                               # type: ignore
 from geometry_msgs.msg import PointStamped, Point, PoseArray, Pose # type: ignore
 from mavros_msgs.srv import CommandLong                      # type: ignore
@@ -52,9 +52,10 @@ on_line = False
 line_end = False
 not_line_count = 0
 last_telem = 0
+dist = 0
 
 
-def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
+def navigate_wait(x=0, y=0, z=0, yaw=math.radians(90), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
     navigate(x=x, y=y, z=z, yaw=yaw, speed=speed, frame_id=frame_id, auto_arm=auto_arm)
 
     while not rospy.is_shutdown():
@@ -63,10 +64,6 @@ def navigate_wait(x=0, y=0, z=0, yaw=float('nan'), speed=1, frame_id='aruco_map'
             break
         rospy.sleep(0.2)
 
-
-def range_callback(msg):
-    global dist
-    dist = msg.range
 
 
 def get_cords(xy, z, msg): # Image msg, xy point from cam
@@ -102,7 +99,7 @@ def follow_line(bin):
 
 @long_callback
 def image_callback(msg):
-    global vrezki, dist
+    global vrezki, dist, not_line_count
     #if scan:
     img = bridge.imgmsg_to_cv2(msg, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
@@ -128,7 +125,7 @@ def image_callback(msg):
                 x, y, w, h = cv.boundingRect(c)
                 area = w*h
                 if area > 400 and w > 60:
-                    vrezka = get_cords((x, y), dist, msg) 
+                    vrezka = get_cords((x, y), 1.2, msg) 
                     point = np.array([vrezka.point.x, vrezka.point.y])
                     if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
                         print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
@@ -147,7 +144,7 @@ def image_callback(msg):
     else:
         not_line_count +=1
         if not_line_count >= 20:
-            image_sub.register()
+            image_sub.unregister()
             navigate_wait(0, 0, 1.2)
             land()
             rospy.on_shutdown()
@@ -201,13 +198,11 @@ def mission_state(msg):
 
 def main():
    navigate_wait(0, 0, 1, frame_id='body', auto_arm=True)
-   navigate_wait(0, 0, 0, yaw=(math.radians(90)))
    navigate_wait(0.7, 0.7, 1.2)
    set_altitude(z=1.2, frame_id='terrain')
 
 
 if __name__ == '__main__':
     main()
-    rospy.Subscriber('rangefinder/range', Range, range_callback)
     image_sub = rospy.Subscriber('main_camera/image_raw', Image, image_callback)
     rospy.spin()
