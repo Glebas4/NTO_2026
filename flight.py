@@ -135,7 +135,7 @@ def image_callback(msg):
                         print(f"Vrezka at x={round(cx, 2)}; y={round(cy, 2)}")
                         vrezki.append(point)
                         data_pub(point)
-                        aruco_map = draw_map(cx, cy, red, aruco_map, 0.05)
+                        aruco_map = draw_map(cx, cy, red, aruco_map, 1)
             
                     img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
@@ -144,7 +144,7 @@ def image_callback(msg):
             telem = get_telemetry(frame_id='aruco_map')
             img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
             img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
-            aruco_map = draw_map(telem.x, telem.y, yellow, aruco_map, 0.1)
+            aruco_map = draw_map(telem.x, telem.y, yellow, aruco_map, 2)
 
     else:
         not_line_count +=1
