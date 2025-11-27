@@ -4,7 +4,7 @@ from std_srvs.srv import Trigger                             # type: ignore
 from std_msgs.msg import Int16                               # type: ignore
 from clover import long_callback                             # type: ignore
 import cv2 as cv                                             # type: ignore 
-from sensor_msgs.msg import Image, CameraInfo        # type: ignore
+from sensor_msgs.msg import Image, CameraInfo                # type: ignore
 from cv_bridge import CvBridge                               # type: ignore
 from geometry_msgs.msg import PointStamped, Point, PoseArray, Pose # type: ignore
 from mavros_msgs.srv import CommandLong                      # type: ignore
@@ -26,6 +26,7 @@ cmd = rospy.ServiceProxy('/mavros/cmd/command', CommandLong)
 land = rospy.ServiceProxy('land', Trigger)
 
 image_pub = rospy.Publisher('result', Image, queue_size=1)
+points_pub = rospy.Publisher("tubes_map", Image, queue_size=1)
 
 points_pub = rospy.Publisher("tubes", PoseArray, queue_size=10)
 msg = PoseArray()
@@ -44,15 +45,9 @@ kernel_size = (6, 6)
 kernel = cv.getStructuringElement(cv.MORPH_RECT, kernel_size)
 vrezki = []
 
-in_process = False
-scan = False
-home_return = False
-not_home = False
-on_line = False
-line_end = False
-not_line_count = 0
-last_telem = 0
-dist = 0
+aruco_map = cv.imread("/home/clover/aruco_map.png")
+yellow = (0, 255, 255)
+red = (0, 0, 255)
 
 
 def navigate_wait(x=0, y=0, z=0, yaw=math.radians(90), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
@@ -63,6 +58,13 @@ def navigate_wait(x=0, y=0, z=0, yaw=math.radians(90), speed=1, frame_id='aruco_
         if math.sqrt(telem.x ** 2 + telem.y ** 2 + telem.z ** 2) < tolerance:
             break
         rospy.sleep(0.2)
+
+
+def draw_map(x, y, col, img, radius):
+    cx = 70 + 52 * x
+    cy = 426 - 52 * y
+    img = cv.circle(img, (cx, cy), radius, col, -1)
+    return img
 
 
 
@@ -99,26 +101,26 @@ def follow_line(bin):
 
 @long_callback
 def image_callback(msg):
-    global vrezki, dist, not_line_count
-    #if scan:
+    global vrezki, not_line_count, aruco_map
+
     img = bridge.imgmsg_to_cv2(msg, 'bgr8') [0:120, 0:320]
     bin = cv.inRange(img, yellow_low, yellow_up)
 
     if cv.countNonZero(bin) > 10:
-        #on_line = True
-        img_eroded = cv.erode(bin, kernel, iterations=2)
+        img_eroded = cv.erode(bin, kernel, iterations=2)#Сужаем все линии на картинке чтобы "Отлипить" врезки от трубы
         contours, _ = cv.findContours(img_eroded, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+
         if contours:
-            largest_contour = max(contours, key=cv.contourArea)
-            line_mask = np.zeros_like(bin)
-            cv.drawContours(line_mask, [largest_contour], -1, 255, -1)
-            line_mask = cv.dilate(line_mask, kernel, iterations=2)
-            contours, _ = cv.findContours(line_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-            img = cv.drawContours(img, contours, -1, 255, -1)
-            line_mask_inv = cv.bitwise_not(line_mask)
+            largest_contour = max(contours, key=cv.contourArea) #Находим контур основной трубы(самый большой)
+            line_mask = np.zeros_like(bin)#Пустая маска
+            cv.drawContours(line_mask, [largest_contour], -1, 255, -1)#Создаем основную маску,на которой только труба
 
+            line_mask = cv.dilate(line_mask, kernel, iterations=2)#Возвращаем суженную трубу к прежним размерам
+            contours, _ = cv.findContours(line_mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE) 
+            img = cv.drawContours(img, contours, -1, 255, -1)#Визуализация нахождения основной трубы
 
-            vrezki_mask = cv.bitwise_and(line_mask_inv, bin)
+            line_mask_inv = cv.bitwise_not(line_mask) #"НЕ" с маской основной трубы
+            vrezki_mask = cv.bitwise_and(line_mask_inv, bin)# с помощью "И" находим совпадения врезок на 
             contours, _ = cv.findContours(vrezki_mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
             for c in contours:
@@ -126,20 +128,23 @@ def image_callback(msg):
                 area = w*h
                 if area > 400 and w > 60:
                     vrezka = get_cords((x, y), 1.2, msg) 
-                    point = np.array([vrezka.point.x, vrezka.point.y])
+                    cx = vrezka.point.x
+                    cy = vrezka.point.y
+                    point = np.array([cx, cy])
                     if all(np.linalg.norm(point - pnt) >= 0.75 for pnt in vrezki):
-                        print(f"Vrezka at x={round(vrezka.point.x, 2)}; y={round(vrezka.point.y, 2)}")
+                        print(f"Vrezka at x={round(cx, 2)}; y={round(cy, 2)}")
                         vrezki.append(point)
                         data_pub(point)
+                        aruco_map = draw_map(cx, cy, red, aruco_map, 0.05)
             
                     img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
 
             x, y = follow_line(line_mask)
-
-            if x:
-                img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
-                img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
+            telem = get_telemetry(frame_id='aruco_map')
+            img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
+            img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
+            aruco_map = draw_map(cx, cy, red, aruco_map, 0.05)
 
     else:
         not_line_count +=1
@@ -149,7 +154,7 @@ def image_callback(msg):
             land()
             rospy.on_shutdown()
 
-
+    points_pub.publish(bridge.cv2_to_imgmsg(aruco_map, 'bgr8'))
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
@@ -163,37 +168,6 @@ def data_pub(pnt):
     msg.poses.append(pnt)
     points_pub.publish(msg)
 
-
-def mission_state(msg):
-    global in_process, scan, home_return, last_telem
-    if msg.data == 1 and not in_process:
-        in_process = True
-        navigate_wait(0, 0, 0, frame_id="body", auto_arm=True)
-        set_altitude(z=1.2, frame_id='terrain')
-        telem = get_telemetry(frame_id='aruco_map')
-        dist_from_home = math.sqrt(telem.x**2 + telem.y**2)
-        if dist_from_home <= 1 and not on_line:
-            navigate_wait(0.7, 0.7, 1.2)
-            scan = True
-        if home_return and not_home and line_end:
-            scan = False
-            navigate_wait(0, 0, 1.2)
-            land()
-            home_return = False
-            in_process = False
-        elif not line_end and on_line:
-            scan = True
-
-
-    if msg.data == 2:
-        scan = False
-        land()
-        in_process = False
-
-    if msg.data == 3:
-        scan = False
-        cmd(0,400,0,0,0,0,0,0,0,0) #disarm
-        in_process = False
 
 
 def main():
