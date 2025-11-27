@@ -26,7 +26,7 @@ cmd = rospy.ServiceProxy('/mavros/cmd/command', CommandLong)
 land = rospy.ServiceProxy('land', Trigger)
 
 image_pub = rospy.Publisher('result', Image, queue_size=1)
-points_pub = rospy.Publisher("tubes_map", Image, queue_size=1)
+map_pub = rospy.Publisher("tubes_map", Image, queue_size=1)
 
 points_pub = rospy.Publisher("tubes", PoseArray, queue_size=10)
 msg = PoseArray()
@@ -154,7 +154,7 @@ def image_callback(msg):
             land()
             rospy.on_shutdown()
 
-    points_pub.publish(bridge.cv2_to_imgmsg(aruco_map, 'bgr8'))
+    map_pub.publish(bridge.cv2_to_imgmsg(aruco_map, 'bgr8'))
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
 
 
