@@ -63,7 +63,7 @@ def navigate_wait(x=0, y=0, z=0, yaw=math.radians(90), speed=1, frame_id='aruco_
 def draw_map(x, y, col, img, radius):
     cx = 70 + 52 * x
     cy = 426 - 52 * y
-    img = cv.circle(img, (cx, cy), radius, col, -1)
+    img = cv.circle(img, (round(cx), round(cy)), radius, col, -1)
     return img
 
 
@@ -144,7 +144,7 @@ def image_callback(msg):
             telem = get_telemetry(frame_id='aruco_map')
             img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
             img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
-            aruco_map = draw_map(cx, cy, yellow, aruco_map, 0.1)
+            aruco_map = draw_map(telem.x, telem.y, yellow, aruco_map, 0.1)
 
     else:
         not_line_count +=1
