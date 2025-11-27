@@ -49,6 +49,8 @@ aruco_map = cv.imread("/home/clover/aruco_map.png")
 yellow = (0, 255, 255)
 red = (0, 0, 255)
 
+not_line_count = 0
+
 
 def navigate_wait(x=0, y=0, z=0, yaw=math.radians(90), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
     navigate(x=x, y=y, z=z, yaw=yaw, speed=speed, frame_id=frame_id, auto_arm=auto_arm)
@@ -144,7 +146,7 @@ def image_callback(msg):
             telem = get_telemetry(frame_id='aruco_map')
             img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
             img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
-            aruco_map = draw_map(telem.x, telem.y, yellow, aruco_map, 2)
+            aruco_map = draw_map(telem.x, telem.y, yellow, aruco_map, 4)
 
     else:
         not_line_count +=1
