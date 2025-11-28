@@ -4,6 +4,7 @@ from geometry_msgs.msg import Pose, Point, Quaternion
 import tf.transformations as tft
 import random
 import sys
+import os
 import math
 import numpy as np
 
@@ -77,8 +78,8 @@ def gen_points(x1, x2, y1, y2, n):
 
 def gen_pipes(l): #l - длина трубы
     global rot_pipe_angle, main_pipe_angle, main_pipe_end_x, main_pipe_end_y, rot_pipe_end_x, rot_pipe_end_y
-    main_pipe_angle = random.randint(0, 20)
-    rot_pipe_angle = random.randint(main_pipe_angle-20, main_pipe_angle-5) 
+    main_pipe_angle = random.randint(5, 30)
+    rot_pipe_angle = random.randint(main_pipe_angle-30, main_pipe_angle-5) 
     rad = math.radians(main_pipe_angle)
     main_pipe_end_x = l * math.sin(rad) + 1  #Смещение второй точки по X и Y 
     main_pipe_end_y = l * math.cos(rad) + 1
@@ -110,6 +111,9 @@ def main():
         ps3.delete()
         ps4.delete()
         ps5.delete()
+
+        if os.path.exists("log.txt"):
+            os.remove("log.txt")
     else:
         gen_pipes(l=3.4)
         main_pipe_vrezki = gen_points(x1=main_pipe_start_x, x2=main_pipe_end_x, y1=main_pipe_start_y, y2=main_pipe_end_y, n=3)
@@ -130,6 +134,9 @@ def main():
         ps3.spawn()
         ps4.spawn()
         ps5.spawn()
+
+        with open("log.txt", "w") as file:
+            file.write(f"{main_pipe_end_x}, {main_pipe_end_y}\n {rot_pipe_end_x}\n, {rot_pipe_end_x}\n")
 
 
 if __name__ == '__main__':
