@@ -64,7 +64,7 @@ if os.path.exists("log.txt"):
 
 else:
     print("There is no generated map")
-    os.exit(0)
+    os._exit(0)
 
 
 def navigate_wait(x=0, y=0, z=0, yaw=math.radians(90), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
