@@ -59,8 +59,11 @@ if os.path.exists("log.txt"):
         sx = float(file.readline())
         sy = float(file.readline())
 
-    aruco_map = cv.line(aruco_map, (122, 374), (70 + 52*fx, 426-52*fy), yellow, 8)
-    aruco_map = cv.line(aruco_map, (70 + 52*fx, 426-52*fy), (70 + 52*sx, 426-52*sy), yellow, 8)
+    fy = 426-round(52*fy)
+    fx = 426-round(52*fx)
+    
+    aruco_map = cv.line(aruco_map, (122, 374), (fy, fx), yellow, 8)
+    aruco_map = cv.line(aruco_map, (fy, fx), (70 + round(52*sx), 426-round(52*sy)), yellow, 8)
 
 else:
     print("There is no generated map")
@@ -152,7 +155,7 @@ def image_callback(msg):
                         print(f"Vrezka at x={round(cx, 2)}; y={round(cy, 2)}")
                         vrezki.append(point)
                         data_pub(point)
-                        aruco_map = draw_map(cx, cy, red, aruco_map, 1)
+                        aruco_map = draw_map(cx, cy, red, aruco_map, 3)
             
                     img = cv.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
