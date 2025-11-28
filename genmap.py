@@ -136,7 +136,7 @@ def main():
         ps5.spawn()
 
         with open("log.txt", "w") as file:
-            file.write(f"{main_pipe_end_x}\n, {main_pipe_end_y}\n {rot_pipe_end_x}\n, {rot_pipe_end_x}\n")
+            file.write(f"{main_pipe_end_x}\n{main_pipe_end_y}\n{rot_pipe_end_x}\n{rot_pipe_end_x}\n")
 
 
 if __name__ == '__main__':
