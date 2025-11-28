@@ -9,10 +9,11 @@ from cv_bridge import CvBridge                               # type: ignore
 from geometry_msgs.msg import PointStamped, Point, PoseArray, Pose # type: ignore
 from mavros_msgs.srv import CommandLong                      # type: ignore
 import tf2_ros                                               # type: ignore
-import tf2_geometry_msgs                                     # type: ignore
+#import tf2_geometry_msgs                                     # type: ignore
 import image_geometry                                        # type: ignore
 import math                                                  # type: ignore
 import numpy as np                                           # type: ignore
+import os
 
 
 rospy.init_node('flight')
@@ -41,7 +42,7 @@ camera_model.fromCameraInfo(rospy.wait_for_message('main_camera/camera_info', Ca
 
 yellow_low = (78, 220, 220)
 yellow_up = (86, 228, 228)
-kernel_size = (6, 6) 
+kernel_size = (6, 6)
 kernel = cv.getStructuringElement(cv.MORPH_RECT, kernel_size)
 vrezki = []
 
@@ -50,6 +51,20 @@ yellow = (0, 255, 255)
 red = (0, 0, 255)
 
 not_line_count = 0
+
+if os.path.exists("log.txt"):
+    with open("log.txt", "к") as file:
+        fx = float(file.readline())
+        fy = float(file.readline())
+        sx = float(file.readline())
+        sy = float(file.readline())
+
+    aruco_map = cv.line(aruco_map, (122, 374), (70 + 52*fx, 426-52*fy), yellow, 8)
+    aruco_map = cv.line(aruco_map, (70 + 52*fx, 426-52*fy), (70 + 52*sx, 426-52*sy), yellow, 8)
+
+else:
+    print("There is no generated map")
+    os.exit(0)
 
 
 def navigate_wait(x=0, y=0, z=0, yaw=math.radians(90), speed=1, frame_id='aruco_map', auto_arm=False, tolerance=0.2):
@@ -143,10 +158,8 @@ def image_callback(msg):
 
 
             x, y = follow_line(line_mask)
-            telem = get_telemetry(frame_id='aruco_map')
             img = cv.line(img, (160, 120), (x, y), (0, 0, 255), 2)
             img = cv.circle(img, (x, y), 5, (0, 0, 255), -1)
-            aruco_map = draw_map(telem.x, telem.y, yellow, aruco_map, 4)
 
     else:
         not_line_count +=1
@@ -179,6 +192,7 @@ def main():
 
 
 if __name__ == '__main__':
+    map_pub.publish(bridge.cv2_to_imgmsg(aruco_map, 'bgr8'))
     main()
     image_sub = rospy.Subscriber('main_camera/image_raw', Image, image_callback)
     rospy.spin()
