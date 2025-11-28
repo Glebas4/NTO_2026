@@ -53,7 +53,7 @@ red = (0, 0, 255)
 not_line_count = 0
 
 if os.path.exists("log.txt"):
-    with open("log.txt", "к") as file:
+    with open("log.txt", "r") as file:
         fx = float(file.readline())
         fy = float(file.readline())
         sx = float(file.readline())
