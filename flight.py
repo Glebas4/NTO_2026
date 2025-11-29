@@ -26,8 +26,8 @@ set_velocity = rospy.ServiceProxy('set_velocity', srv.SetVelocity)
 cmd = rospy.ServiceProxy('/mavros/cmd/command', CommandLong)
 land = rospy.ServiceProxy('land', Trigger)
 
-image_pub = rospy.Publisher('result', Image, queue_size=1)
-map_pub = rospy.Publisher("tubes_map", Image, queue_size=1)
+image_pub = rospy.Publisher('result', Image, queue_size=2)
+map_pub = rospy.Publisher("tubes_map", Image, queue_size=2)
 
 points_pub = rospy.Publisher("tubes", PoseArray, queue_size=10)
 msg = PoseArray()
