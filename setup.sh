@@ -21,7 +21,6 @@ fi
 
 cd /home/clover/NTO_2026/front-end
 mv clover.html /home/clover/catkin_ws/src/clover/clover/www
-mv app.js /home/clover/catkin_ws/src/clover/clover/www/js
 if [ $? -eq 0 ]; then
     echo "Front-end files have been successfully moved to /home/clover/catkin_ws/src/clover/clover/www"
 else
