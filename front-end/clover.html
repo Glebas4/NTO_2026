@@ -5,34 +5,33 @@
  </head>
 <meta charset="utf-8" />
  <body>
-    <form  method="POST">
-            <input class="btn" type='button' id="start"   value="START">
-            <input class="btn" type="button" id="stop"   value="LAND">
-            <input class="btn" type="button" id="kill"   value="KILL">
-    </form>
 
-    <iframe src="http://localhost:8080/stream_viewer?topic=/result"  width="440" height="220"></iframe>
+    <iframe src="http://localhost:8080/stream_viewer?topic=/result"  width="330" height="130"></iframe>
+    <iframe src="http://localhost:8080/stream_viewer?topic=/tubes_map"  width="570" height="500"></iframe>
+    <div id="cords" style="color:black; font-size:20px;"></div>
 <meta charset="utf-8" />
  <script src="js/roslib.js"></script>
-    <script type="text/javascript">
+   <script type="text/javascript">
 
-    var ros = new ROSLIB.Ros({ url: 'ws://' + location.hostname + ':9090' });
-    ros.on('connection', function() {console.log('Connected to websocket server.');});
-    ros.on('error', function(error) {console.log('Error connecting to websocket server: ', error);});
-    ros.on('close', function() {console.log('Connection to websocket server closed.');});
+   var ros = new ROSLIB.Ros({ url: 'ws://' + location.hostname + ':9090' });
+   ros.on('connection', function() {console.log('Connected to websocket server.');});
+   ros.on('error', function(error) {console.log('Error connecting to websocket server: ', error);});
+   ros.on('close', function() {console.log('Connection to websocket server closed.');});
     
-    var req = new ROSLIB.ServiceRequest({value : false});
+   var sub = new ROSLIB.Topic
+   ({
+      ros: ros,
+      name: 'tubes',
+      messageType: 'geometry_msgs/PoseArray'
+   });
 
-    var killsw = new ROSLIB.Service    
-      ({
-         ros : ros,      
-         name : '/mavros/cmd/arming',
-         serviceType : 'mavros_msgs/CommandBool'    
-      });
 
-    const k = document.getElementById("kill");   
-    k.addEventListener("click", kill);
-    function kill(){killsw.callService(req, function(result) {console.log('DISARMED');});}
+   let text = "";
+   sub.subscribe(function(msg){
+      msg.poses.forEach((pose, i) => {
+      text += `${i}: (${pose.position.x.toFixed(2)}, ${pose.position.y.toFixed(2)})\n`;})});
+   document.getElementById("cords").innerText = text;
+
 
     </script>
     </body>
