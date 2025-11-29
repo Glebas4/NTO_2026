@@ -4,15 +4,23 @@ cd NTO_2026
 chmod +x setup.sh
 ./setup.sh
 
+
 После фразы "Setup was completed" можете запустить Gazebo
+
 
 python3 genmap.py - генерация труб (Без аргументов)
 python3 genmap.py clear - очистка карты (При запуске можно указать любые аргументы, например python3 genmap.py abrakadabra)
+
+
 python3 flight.py - запуск полетной миссии
+
+
 localhost/clover/clover.html - WEB приложение
 
 
+
 ПРИМЕЧАНИЯ:
+
 1)bash скрипт будет взаимодейстовать с сетью(скачивание пакета image_geometry)
 
 2)После генерации труб создается файл log.txt, этот файл нужен ТОЛЬКО для отрисовывания основной трубы на 2D aruco_map карте(WEB приложение),
