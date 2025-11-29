@@ -9,7 +9,7 @@ from cv_bridge import CvBridge                               # type: ignore
 from geometry_msgs.msg import PointStamped, Point, PoseArray, Pose # type: ignore
 from mavros_msgs.srv import CommandLong                      # type: ignore
 import tf2_ros                                               # type: ignore
-#import tf2_geometry_msgs                                     # type: ignore
+import tf2_geometry_msgs                                    # type: ignore
 import image_geometry                                        # type: ignore
 import math                                                  # type: ignore
 import numpy as np                                           # type: ignore
@@ -60,10 +60,10 @@ if os.path.exists("log.txt"):
         sy = float(file.readline())
 
     fy = 426-round(52*fy)
-    fx = 426-round(52*fx)
+    fx = 70 + round(52*fx)
     
-    aruco_map = cv.line(aruco_map, (122, 374), (fy, fx), yellow, 8)
-    aruco_map = cv.line(aruco_map, (fy, fx), (70 + round(52*sx), 426-round(52*sy)), yellow, 8)
+    aruco_map = cv.line(aruco_map, (122, 374), (fx, fy), yellow, 8)
+    aruco_map = cv.line(aruco_map, (fx, fy), (70 + round(52*sx), 426-round(52*sy)), yellow, 8)
 
 else:
     print("There is no generated map")
@@ -170,7 +170,9 @@ def image_callback(msg):
             image_sub.unregister()
             navigate_wait(0, 0, 1.2)
             land()
-            rospy.on_shutdown()
+            for pnt in vrezki:
+                print(f'Pipe found at x={round(pnt[0], 2)}; y={round(pnt[1], 2)}')
+            rospy.signal_shutdown("End")
 
     map_pub.publish(bridge.cv2_to_imgmsg(aruco_map, 'bgr8'))
     image_pub.publish(bridge.cv2_to_imgmsg(img, 'bgr8'))
