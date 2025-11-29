@@ -9,6 +9,7 @@ chmod +x setup.sh
 
 
 python3 genmap.py - генерация труб (Без аргументов)
+
 python3 genmap.py clear - очистка карты (При запуске можно указать любые аргументы, например python3 genmap.py abrakadabra)
 
 
