@@ -1,8 +1,13 @@
 ИСПОЛЬЗОВАНИЕ:
+
 git clone http://github.com/Glebas4/NTO_2026
+
 cd NTO_2026
+
 chmod +x setup.sh
+
 ./setup.sh
+
 
 
 После фразы "Setup was completed" можете запустить Gazebo
