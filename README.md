@@ -9,8 +9,8 @@ chmod +x setup.sh
 ./setup.sh
 
 
-
 После фразы "Setup was completed" можете запустить Gazebo
+
 
 
 python3 genmap.py - генерация труб (Без аргументов)
@@ -22,6 +22,7 @@ python3 flight.py - запуск полетной миссии
 
 
 localhost/clover/clover.html - WEB приложение
+
 
 
 
