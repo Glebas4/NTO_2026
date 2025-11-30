@@ -11,13 +11,14 @@ chmod +x setup.sh #Сделать скрипт настройки исполня
 ./setup.sh  #Запустить настройку
 
 
-После фразы "Setup was completed" можете запустить Gazebo
+После фразы "Setup was completed" можете запустить Gazebo.
 
-Затем перейдите по http://localhost/clover/clover.html в браузере
+Затем перейдите по http://localhost/clover/clover.html в браузере.
 
-В терминале(в том,который запустили в начале) пропишите python3 genmap.py
+В терминале(в том,который запустили в начале) пропишите python3 genmap.py 
 
-После завершения программы,можете запускать миссию - python3 flight.py
+После завершения программы,можете запускать миссию - python3 flight.py 
+
 
 
 КРАТКОЕ ОПИСАНИЕ:
@@ -31,6 +32,7 @@ python3 flight.py - запуск полетной миссии
 
 
 http://localhost/clover/clover.html - WEB приложение 
+
 
 
 
