@@ -29,7 +29,7 @@ land = rospy.ServiceProxy('land', Trigger)
 image_pub = rospy.Publisher('result', Image, queue_size=2)
 map_pub = rospy.Publisher("tubes_map", Image, queue_size=2)
 
-points_pub = rospy.Publisher("tubes", PoseArray, queue_size=10)
+points_pub = rospy.Publisher("/tubes", PoseArray, queue_size=10)
 msg = PoseArray()
 msg.header.stamp = rospy.Time.now()
 msg.header.frame_id = "aruco_map"
