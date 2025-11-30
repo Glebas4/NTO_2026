@@ -21,7 +21,7 @@
    var sub = new ROSLIB.Topic
    ({
       ros: ros,
-      name: 'tubes',
+      name: '/tubes',
       messageType: 'geometry_msgs/PoseArray'
    });
 
@@ -30,6 +30,7 @@
    sub.subscribe(function(msg){
       msg.poses.forEach((pose, i) => {
       text += `${i}: (${pose.position.x.toFixed(2)}, ${pose.position.y.toFixed(2)})\n`;})});
+   console.log(text);
    document.getElementById("cords").innerText = text;
 
 
