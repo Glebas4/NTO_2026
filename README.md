@@ -1,17 +1,26 @@
 ИСПОЛЬЗОВАНИЕ:
 
-git clone http://github.com/Glebas4/NTO_2026
+Откройте терминал и введите следующие команды:
 
-cd NTO_2026
+git clone http://github.com/Glebas4/NTO_2026 #Клонирование репозитория
 
-chmod +x setup.sh
+cd NTO_2026 #Открыть директорию с решением
 
-./setup.sh
+chmod +x setup.sh #Сделать скрипт настройки исполняемым
+
+./setup.sh  #Запустить настройку
 
 
 После фразы "Setup was completed" можете запустить Gazebo
 
+Затем перейдите по http://localhost/clover/clover.html в браузере
 
+В терминале(в том,который запустили в начале) пропишите python3 genmap.py
+
+После завершения программы,можете запускать миссию - python3 flight.py
+
+
+КРАТКОЕ ОПИСАНИЕ:
 
 python3 genmap.py - генерация труб (Без аргументов)
 
@@ -21,8 +30,7 @@ python3 genmap.py clear - очистка карты (При запуске мо�
 python3 flight.py - запуск полетной миссии
 
 
-localhost/clover/clover.html - WEB приложение
-
+http://localhost/clover/clover.html - WEB приложение 
 
 
 
