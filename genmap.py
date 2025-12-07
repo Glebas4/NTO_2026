@@ -29,7 +29,7 @@ rot_pipe_end_y = 0
 
 
 
-class pipe:
+class pipe: #Класс трубы
     def __init__(self, x=0, y=0, path=0, name=0, angle=0):
         self.x = x
         self.y = y
@@ -42,9 +42,9 @@ class pipe:
 
         self.angle = angle
         self.q = tft.quaternion_from_euler(0, 0, self.angle)
-        self.pose.orientation = Quaternion(*self.q)
+        self.pose.orientation = Quaternion(*self.q) #Описание позиции трубы в мировых координатах
     
-    def spawn(self):
+    def spawn(self): #Спавн трубы
         with open(self.path, 'r') as f:
             sdf_file = f.read()
 
@@ -55,7 +55,7 @@ class pipe:
                              reference_frame="world")
         print(gen.status_message, self.name, f"x={self.x}; y={self.y}; yaw={self.angle}")
 
-    def delete(self):
+    def delete(self): #Удаляем трубу
         resp = delete_service(self.name)
         print(resp.status_message, self.name)
 
@@ -65,11 +65,11 @@ def gen_points(x1, x2, y1, y2, n):
     pnts = []
     p1 = np.array([x1, y1])
     p2 = np.array([x2, y2])
-    vector = p2 - p1
-    while len(pnts) != n:
-        t = random.uniform(0, 1)
-        point = p1 + t * vector
-        if all(np.linalg.norm(point - pnt) >=0.75 for pnt in points): #Расстояние между точками
+    vector = p2 - p1 #Вектор,соединяющий точки,координаты которых заданы в аргументах
+    while len(pnts) != n: #Повторяем до тех пор пока не сгенерится заданное колво точек
+        t = random.uniform(0, 1) #Берем случайню долю от вектора
+        point = p1 + t * vector #Координата = начало + вектор*долю
+        if all(np.linalg.norm(point - pnt) >=0.75 for pnt in points): #Проверяем чтобы расстояние было > 0.75
             pnts.append(point)
             points.append(point)
     
@@ -78,24 +78,24 @@ def gen_points(x1, x2, y1, y2, n):
 
 def gen_pipes(l): #l - длина трубы
     global rot_pipe_angle, main_pipe_angle, main_pipe_end_x, main_pipe_end_y, rot_pipe_end_x, rot_pipe_end_y
-    main_pipe_angle = random.randint(5, 30)
-    rot_pipe_angle = random.randint(main_pipe_angle-30, main_pipe_angle-5) 
+    main_pipe_angle = random.randint(5, 30) #Случайный угол
+    rot_pipe_angle = random.randint(main_pipe_angle-30, main_pipe_angle-5) #Градусная шкала второй трубы смещается на угол,на который повернута первая труба в плоскости XY
     rad = math.radians(main_pipe_angle)
-    main_pipe_end_x = l * math.sin(rad) + 1  #Смещение второй точки по X и Y 
+    main_pipe_end_x = l * math.sin(rad) + 1  #Координаты второй точки первой трубы
     main_pipe_end_y = l * math.cos(rad) + 1
 
     rad2 = math.radians(rot_pipe_angle)
-    rot_pipe_end_x = l * math.sin(rad2) + main_pipe_end_x
+    rot_pipe_end_x = l * math.sin(rad2) + main_pipe_end_x #Координаты второй точки второй трубы
     rot_pipe_end_y = l * math.cos(rad2) + main_pipe_end_y
 
-    main_pipe_angle = -math.radians(main_pipe_angle)
+    main_pipe_angle = -math.radians(main_pipe_angle) #в Gazebo угол задается в радианах,при чем угол положительный,если он повернут против часовой стрелки
     rot_pipe_angle = -math.radians(rot_pipe_angle)
 
 
 
 def main():
     rospy.wait_for_service('/gazebo/spawn_sdf_model', timeout=10)
-    if len(sys.argv)>1:
+    if len(sys.argv)>1: #Если прога запущена с каким либо аргументом-очищаем карту
         pmain =  pipe(name="pipe_main")
         prot  =  pipe(name="pipe_rot")
         ps1   =  pipe(name="pipe_small_1")
@@ -127,7 +127,7 @@ def main():
         ps4   = pipe(rot_pipe_vrezki[0][0], rot_pipe_vrezki[0][1], path+"_small/pipe_small.sdf", "pipe_small_4", rot_pipe_angle-1.57)
         ps5   = pipe(rot_pipe_vrezki[1][0], rot_pipe_vrezki[1][1], path+"_small/pipe_small.sdf", "pipe_small_5", rot_pipe_angle-1.57)
 
-        pmain.spawn()
+        pmain.spawn() #Нефтепровод собирается из 2 труб 
         prot.spawn()
         ps1.spawn()
         ps2.spawn()
@@ -135,7 +135,7 @@ def main():
         ps4.spawn()
         ps5.spawn()
 
-        with open("log.txt", "w") as file:
+        with open("log.txt", "w") as file: #Записываем в файл координаты трубы,ТОЛЬКО ДЛЯ ОТРИСОВКИ НА aruco_map,АЛГОРИТМУ ПОЛЕТА И РАСПОЗНАВАНИЯ ЭТО НЕ ПОМОГАЕТ
             file.write(f"{main_pipe_end_x}\n{main_pipe_end_y}\n{rot_pipe_end_x}\n{rot_pipe_end_y}\n")
 
 
